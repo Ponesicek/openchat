@@ -95,16 +95,6 @@ export const characters = sqliteTable("characters", {
   examples: text('', { mode: 'json' }),
 });
 
-export const textModelsProviders = sqliteTable("textModelsProviders", {
-  name: text().notNull().primaryKey(),
-  apiKey: text(),
-  apiUrl: text(),
-  defaultModel: text(),
-  fallbackModel: text(),
-  additionalParams: text('', { mode: 'json' }),
-  postProcess: integer().default(0),
-});
-
 export const chats = sqliteTable("chats", {
   id: integer().primaryKey(),
   name: text().notNull(),

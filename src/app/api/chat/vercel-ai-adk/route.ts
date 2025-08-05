@@ -6,7 +6,7 @@ import {
   stepCountIs,
 } from 'ai';
 import { z } from 'zod';
-import { getInfo } from './getInfo';
+import { getInfo } from '../get-info/route';
 
 export const maxDuration = 30;
 
