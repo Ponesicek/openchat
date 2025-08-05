@@ -1,5 +1,5 @@
 export interface message {
-    id: string;
+    id: number;
     role: "user" | "assistant" | "system";
     reasoning: string;
     text: string;

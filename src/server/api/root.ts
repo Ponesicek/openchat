@@ -1,4 +1,5 @@
 import { infoRouter } from "@/server/api/routers/info";
+import { lmstudioRouter } from "@/server/api/routers/lmstudio";
 import { createCallerFactory, createTRPCRouter } from "@/server/api/trpc";
 
 /**
@@ -8,6 +9,7 @@ import { createCallerFactory, createTRPCRouter } from "@/server/api/trpc";
  */
 export const appRouter = createTRPCRouter({
   info: infoRouter,
+  lmstudio: lmstudioRouter,
 });
 
 // export type definition of API

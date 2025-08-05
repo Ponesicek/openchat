@@ -5,6 +5,7 @@ import { Geist } from "next/font/google";
 
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { ChatsSidebar } from "@/components/chats-sidebar";
+import { TRPCReactProvider } from "@/trpc/react";
 
 export const metadata: Metadata = {
   title: "OpenChat",
@@ -26,12 +27,14 @@ export default function RootLayout({
         className={`${geist.variable} antialiased`}
       >
       <main >
+        <TRPCReactProvider>
       <SidebarProvider>
       <ChatsSidebar />
         <div className="w-full"  >
         {children}
         </div> 
     </SidebarProvider>
+    </TRPCReactProvider>
       </main>
       </body>
     </html>
