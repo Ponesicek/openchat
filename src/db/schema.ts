@@ -102,3 +102,13 @@ export const chats = sqliteTable("chats", {
   loreBooks: text('', { mode: 'json' }),
   additionalParams: text('', { mode: 'json' }),
 });
+
+export const textModelsProviders = sqliteTable("textModelsProviders", {
+  id: integer().primaryKey(),
+  name: text().notNull(),
+  apiUrl: text().notNull(),
+  apiKey: text(),
+  defaultModel: text().notNull(),
+  fallbackModel: text().notNull(),
+  postProcess: integer().notNull(),
+});

@@ -58,7 +58,8 @@ onSubmit: (values: {input: string}) => void}) {
                 <div className="flex justify-between flex-row">
                     <div className="flex flex-row gap-2">
                     <DropdownMenu >
-                    <DropdownMenuTrigger className="ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none focus-visible:border-none focus-visible:shadow-none">
+                    <DropdownMenuTrigger className="ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none 
+                    focus-visible:border-none focus-visible:shadow-none">
                         <DivButton>
                             <MenuIcon />
                         </DivButton>

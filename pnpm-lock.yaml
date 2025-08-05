@@ -23,6 +23,9 @@ importers:
       '@libsql/client':
         specifier: ^0.15.10
         version: 0.15.10
+      '@lmstudio/sdk':
+        specifier: ^1.4.0
+        version: 1.4.0
       '@radix-ui/react-dialog':
         specifier: ^1.1.14
         version: 1.1.14(@types/react-dom@19.1.7(@types/react@19.1.9))(@types/react@19.1.9)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -775,6 +778,12 @@ packages:
     resolution: {integrity: sha512-f5bGH8+3A5sn6Lrqg8FsQ09a1pYXPnKGXGTFiAYlfQXVst1tUTxDTugnuWcJYKXyzDe/T7ccxyIZXeSmPOhq8A==}
     cpu: [x64]
     os: [win32]
+
+  '@lmstudio/lms-isomorphic@0.4.6':
+    resolution: {integrity: sha512-v0LIjXKnDe3Ff3XZO5eQjlVxTjleUHXaom14MV7QU9bvwaoo3l5p71+xJ3mmSaqZq370CQ6pTKCn1Bb7Jf+VwQ==}
+
+  '@lmstudio/sdk@1.4.0':
+    resolution: {integrity: sha512-1vVBFHLXk/tsA1qr3w3XVEevO5KcCzyKZRFBTPODFqlk31OqbRV/3lsXHU/np4AqgJahXHkjilQnaBn5IhCEGg==}
 
   '@napi-rs/wasm-runtime@0.2.12':
     resolution: {integrity: sha512-ZVWUcfwY4E/yPitQJl481FjFo3K22D6qF0DuFH6Y/nbnE11GY5uguDxZMGXPQ8WQ0128MXQD7TnfHyK4oWoIJQ==}
@@ -2378,6 +2387,9 @@ packages:
     resolution: {integrity: sha512-g1MWMLBiz8FKi1e4w0UyVL3w+iJceWAFBAaBnnGKOpNa5f8TLktkbre1+s6oICydWAm+HRUGTmI+//xv2hvXYA==}
     hasBin: true
 
+  jsonschema@1.5.0:
+    resolution: {integrity: sha512-K+A9hhqbn0f3pJX17Q/7H6yQfD/5OXgdrR5UE12gMXCiN9D5Xq2o5mddV2QEcX/bjla99ASsAAQUyMCCRWAEhw==}
+
   jsx-ast-utils@3.3.5:
     resolution: {integrity: sha512-ZZow9HBI5O6EPgSJLUb8n2NKgmVWTwCvHGwFuJlMjvLFqlGG6pjirPhtdsseaLZjSibD8eegzmYpUZwoIlj2cQ==}
     engines: {node: '>=4.0'}
@@ -3074,6 +3086,9 @@ packages:
     peerDependencies:
       zod: ^3.24.1
 
+  zod@3.25.76:
+    resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
+
   zod@4.0.14:
     resolution: {integrity: sha512-nGFJTnJN6cM2v9kXL+SOBq3AtjQby3Mv5ySGFof5UGRHrRioSJ5iG680cYNjE/yWk671nROcpPj4hAS8nyLhSw==}
 
@@ -3551,6 +3566,24 @@ snapshots:
 
   '@libsql/win32-x64-msvc@0.5.17':
     optional: true
+
+  '@lmstudio/lms-isomorphic@0.4.6':
+    dependencies:
+      ws: 8.18.3
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
+
+  '@lmstudio/sdk@1.4.0':
+    dependencies:
+      '@lmstudio/lms-isomorphic': 0.4.6
+      chalk: 4.1.2
+      jsonschema: 1.5.0
+      zod: 3.25.76
+      zod-to-json-schema: 3.24.6(zod@3.25.76)
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
 
   '@napi-rs/wasm-runtime@0.2.12':
     dependencies:
@@ -5258,6 +5291,8 @@ snapshots:
     dependencies:
       minimist: 1.2.8
 
+  jsonschema@1.5.0: {}
+
   jsx-ast-utils@3.3.5:
     dependencies:
       array-includes: 3.1.9
@@ -6030,8 +6065,14 @@ snapshots:
 
   yocto-queue@0.1.0: {}
 
+  zod-to-json-schema@3.24.6(zod@3.25.76):
+    dependencies:
+      zod: 3.25.76
+
   zod-to-json-schema@3.24.6(zod@4.0.14):
     dependencies:
       zod: 4.0.14
+
+  zod@3.25.76: {}
 
   zod@4.0.14: {}
