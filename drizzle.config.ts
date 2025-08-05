@@ -1,13 +1,12 @@
-import { config } from 'dotenv';
-import { defineConfig } from "drizzle-kit";
+import { type Config } from "drizzle-kit";
 
-config({ path: '.env' });
+import { env } from "@/env";
 
-export default defineConfig({
-  schema: "./src/db/schema.ts",
-  out: "./migrations",
+export default {
+  schema: "./src/server/db/schema.ts",
   dialect: "sqlite",
   dbCredentials: {
-    url: process.env.DB_FILE_NAME!,
+    url: env.DATABASE_URL,
   },
-});
+  tablesFilter: ["openchat_*"],
+} satisfies Config;

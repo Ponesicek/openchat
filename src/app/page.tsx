@@ -5,21 +5,23 @@ import Message from '@/components/message';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from "zod"
+import { useState } from 'react';
+import type { message } from '@/types';
 
 const formSchema = z.object({
   input: z.string().min(1),
 })
 
-export default async function Chat() {
+export default function Chat() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       input: "",
     },
   })
+  const [messages, setMessages] = useState<message[]>([])
 
-
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  function onSubmit(values: z.infer<typeof formSchema>) {
     form.reset()
   }
 

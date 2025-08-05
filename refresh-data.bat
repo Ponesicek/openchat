@@ -1,5 +1,5 @@
-del data\local.db /s /q
 del data\config.json /s /q
-pnpm drizzle-kit push
-pnpm tsx src\db\seed.ts
+del data\db.sqlite /s /q
+pnpm db:push
+pnpm tsx data\seed.ts
 echo "Data refreshed!"

@@ -1,7 +1,18 @@
 export interface message {
     id: string;
     role: "user" | "assistant" | "system";
-    content: string;
+    reasoning: string;
+    text: string;
+    tool_calls: {
+        name: string;
+        args: Record<string, unknown>;
+        position: number; // In message
+    }[];
+    files: {
+        name: string;
+        type: string;
+        size: number;
+    }[];
     createdAt: number;
 }
 

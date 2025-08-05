@@ -1,7 +1,7 @@
 import { Textarea } from "@/components/ui/textarea"
 import { Form, FormField, FormItem } from "@/components/ui/form"
 import { Button, DivButton } from "./ui/button"
-import { UseFormReturn } from "react-hook-form";
+import type { UseFormReturn } from "react-hook-form";
 import { useRef } from "react";
 import { MenuIcon, WandSparkles } from "lucide-react";
 import {
@@ -25,7 +25,7 @@ onSubmit: (values: {input: string}) => void}) {
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (e.key === 'Enter' && !e.ctrlKey && !e.shiftKey) {
             e.preventDefault();
-            form.handleSubmit(onSubmit)();
+            form.handleSubmit(onSubmit)().catch(console.error);
         }
     };
 
@@ -58,8 +58,7 @@ onSubmit: (values: {input: string}) => void}) {
                 <div className="flex justify-between flex-row">
                     <div className="flex flex-row gap-2">
                     <DropdownMenu >
-                    <DropdownMenuTrigger className="ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none 
-                    focus-visible:border-none focus-visible:shadow-none">
+                    <DropdownMenuTrigger className="ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none focus-visible:border-none focus-visible:shadow-none">
                         <DivButton>
                             <MenuIcon />
                         </DivButton>

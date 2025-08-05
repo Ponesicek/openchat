@@ -1,6 +1,6 @@
-import { db } from "./drizzle";
-import * as schema from "./schema";
-import { config } from "./json";
+import { db } from "../src/server/db";
+import * as schema from "../src/server/db/schema";
+import { config } from "../src/server/db/json";
 
 async function main() {
     config.set('connection', {

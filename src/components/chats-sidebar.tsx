@@ -13,7 +13,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import { useState } from "react";
-import { Chat, UIMessage } from "@ai-sdk/react";
+import type { message } from "@/types";
 
 const chats = [
   {
@@ -44,7 +44,7 @@ const chats = [
 ]
 
 function FetchChats() {
-  const [chats, setChats] = useState<Chat<UIMessage>[]>([]);
+  const [chats, setChats] = useState<message[]>([]);
 }
 
 
