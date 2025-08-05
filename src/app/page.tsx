@@ -1,28 +1,36 @@
 'use client';
 
 import { useChat } from '@ai-sdk/react';
-import { useState } from 'react';
 import InputBox from '@/components/inputbox';
 import Message from '@/components/message';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from "zod"
+
+const formSchema = z.object({
+  input: z.string().min(1),
+})
 
 export default function Chat() {
-  const [input, setInput] = useState('');
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      input: "",
+    },
+  })
   const { messages, sendMessage } = useChat();
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    sendMessage({ text: values.input })
+    form.reset()
+  }
+
   return (
     <div className="flex flex-col w-full max-w-xl py-24 mx-auto stretch">
       {messages.map(message => (
         <Message key={message.id} message={message} />
       ))}
-
-      <form
-        onSubmit={e => {
-          e.preventDefault();
-          sendMessage({ text: input });
-          setInput('');
-        }}
-      >
-        <InputBox input={input} setInput={setInput} />
-      </form>
+      <InputBox form={form} onSubmit={onSubmit} />
     </div>
   );
 }
