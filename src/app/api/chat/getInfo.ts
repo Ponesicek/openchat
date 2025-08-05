@@ -11,8 +11,8 @@ export async function getInfo() {
       where: eq(textModelsProviders.name, provider),
     });
   
-    if (!provider || !providerSettings?.defaultModel) {
-      return new Response(`${!provider ? 'Provider' : 'Model'} not found`, { status: 404 });
+    if (!provider || !providerSettings?.defaultModel || !providerSettings.apiUrl) {
+      return new Response(`${!provider ? 'Provider' : ''} ${!providerSettings?.defaultModel ? 'Model' : ''} ${!providerSettings?.apiUrl ? 'API URL' : ''} not found`, { status: 422 });
     }
   
     let AIEndpoint;
@@ -20,12 +20,12 @@ export async function getInfo() {
       case 'LMStudio':
         AIEndpoint = createOpenAICompatible({
           name: 'lmstudio',
-          baseURL: 'http://localhost:1234/v1',
+          baseURL: providerSettings.apiUrl,
         });
         break;
       case 'OpenAI':
         if (!providerSettings.apiKey) {
-            alert('No API key found, generation may fail');
+            return new Response('No API key found', { status: 422 });
         }
         AIEndpoint = createOpenAI({
           apiKey: providerSettings.apiKey || '',

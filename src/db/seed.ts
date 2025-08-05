@@ -4,8 +4,26 @@ import { config } from "./json";
 
 async function main() {
     config.set('general', {
-        provider: 'OpenAI'
+        provider: 'LMStudio'
     });
+    config.set('AI', {
+        defaultPrompt: 'Write {{char}}\'s next reply in a fictional chat between {{char}} and {{user}}.',
+    });
+    config.set('LoreBook', {
+      scanDepth: 2,
+      contextPercentage: 25,
+      budgetCap: 0,
+      minActivations: 0,
+      maxDepth: 0,
+      maxRecursionSteps: 0,
+      includeNames: true,
+      recursiveScan: true,
+      caseSensitive: false,
+      matchWholeWords: true,
+      useGroupScoring: false,
+      alertOnOverflow: false,
+      insertionStrategy: 'CLF'
+  });
 
     const OpenAI: typeof schema.textModelsProviders.$inferInsert = {
       name: 'OpenAI',
@@ -16,7 +34,7 @@ async function main() {
     };
     const LMStudio: typeof schema.textModelsProviders.$inferInsert = {
       name: 'LMStudio',
-      apiUrl: 'https://api.lmstudio.ai/v1',
+      apiUrl: 'http://localhost:1234/v1',
       defaultModel: 'google/gemma-3n-e4b',
       fallbackModel: 'google/gemma-3-1b',
       postProcess: 0,

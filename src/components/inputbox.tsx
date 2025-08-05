@@ -1,9 +1,17 @@
 import { Textarea } from "@/components/ui/textarea"
 import { Form, FormField, FormItem } from "@/components/ui/form"
-import { Button } from "./ui/button"
+import { Button, DivButton } from "./ui/button"
 import { UseFormReturn } from "react-hook-form";
 import { useRef } from "react";
 import { MenuIcon, WandSparkles } from "lucide-react";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+  } from "@/components/ui/dropdown-menu"
 
 export default function InputBox({form, onSubmit}: {form: UseFormReturn<{
     input: string;
@@ -28,7 +36,7 @@ onSubmit: (values: {input: string}) => void}) {
     };
 
     return (
-        <div className="fixed bottom-0 w-full max-w-xl p-2 rounded-t-lg bg-accent flex flex-col">
+        <div className="fixed bottom-0 w-full max-w-xl p-2 rounded-t-lg bg-accent flex flex-col border-t-5 border-x-5 border-primary">
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 ">
                 <FormField
@@ -49,9 +57,21 @@ onSubmit: (values: {input: string}) => void}) {
                 />
                 <div className="flex justify-between flex-row">
                     <div className="flex flex-row gap-2">
-                        <Button type="button" className="">
+                    <DropdownMenu >
+                    <DropdownMenuTrigger className="ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none focus-visible:border-none focus-visible:shadow-none">
+                        <DivButton>
                             <MenuIcon />
-                        </Button>
+                        </DivButton>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem>Profile</DropdownMenuItem>
+                        <DropdownMenuItem>Billing</DropdownMenuItem>
+                        <DropdownMenuItem>Team</DropdownMenuItem>
+                        <DropdownMenuItem>Subscription</DropdownMenuItem>
+                    </DropdownMenuContent>
+                    </DropdownMenu>
                         <Button type="button" className="">
                             <WandSparkles />
                         </Button>

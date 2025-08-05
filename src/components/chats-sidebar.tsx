@@ -12,8 +12,10 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
+import { useState } from "react";
+import { Chat, UIMessage } from "@ai-sdk/react";
 
-const items = [
+const chats = [
   {
     title: "Home",
     url: "#",
@@ -41,6 +43,11 @@ const items = [
   },
 ]
 
+function FetchChats() {
+  const [chats, setChats] = useState<Chat<UIMessage>[]>([]);
+}
+
+
 export function ChatsSidebar() {
   return (
     <Sidebar>
@@ -65,12 +72,12 @@ export function ChatsSidebar() {
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
+              {chats.map((chat) => (
+                <SidebarMenuItem key={chat.title}>
                   <SidebarMenuButton asChild>
-                    <a href={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
+                    <a href={chat.url}>
+                      <chat.icon />
+                      <span>{chat.title}</span>
                     </a>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
