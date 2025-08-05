@@ -5,7 +5,7 @@ import Message from '@/components/message';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from "zod"
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import type { message } from '@/types';
 import { api } from '@/trpc/react';
 
@@ -21,27 +21,20 @@ export default function Chat() {
     },
   })
   const [messages, setMessages] = useState<message[]>([])
-  const [isGenerating, setIsGenerating] = useState(false)
+  const [currentInput, setCurrentInput] = useState<{
+    prompt: string,
+    model: string,
+    chat: { role: "user" | "assistant", content: string }[]
+  } | null>(null)
+  
+  // Use ref to track if we're currently generating to avoid state-based re-renders
+  const isGeneratingRef = useRef(false)
 
-  // Create stable subscription input using useMemo to prevent unnecessary re-subscriptions
-  const subscriptionInput = useMemo(() => {
-    if (!isGenerating || messages.length === 0) return null;
-    
-    return {
-      prompt: messages[messages.length - 2]?.text || "", // Get the user's message (second to last)
-      model: "mock-model", 
-      chat: messages.map(msg => ({
-        role: msg.role === "system" ? "user" : msg.role, // Convert system to user for simplicity
-        content: msg.text,
-      }))
-    };
-  }, [messages, isGenerating]);
-
-  // Only subscribe when we're generating and have messages
+  // Create subscription
   const generate = api.lmstudio.generate.useSubscription(
-    subscriptionInput, 
+    currentInput, 
     {
-      enabled: subscriptionInput !== null,
+      enabled: currentInput !== null,
       onData: (data) => {
         setMessages((prev) => {
           const lastMessage = prev[prev.length - 1];
@@ -54,12 +47,19 @@ export default function Chat() {
       },
       onError: (error) => {
         console.error('Subscription error:', error);
-        setIsGenerating(false);
+        setCurrentInput(null);
+        isGeneratingRef.current = false;
       },
+      onComplete: () => {
+        setCurrentInput(null);
+        isGeneratingRef.current = false;
+      }
     }
   );
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  const onSubmit = useCallback((values: z.infer<typeof formSchema>) => {
+    if (isGeneratingRef.current) return; // Prevent multiple submissions
+    
     const userMessage: message = {
       id: Date.now(),
       role: "user",
@@ -80,18 +80,22 @@ export default function Chat() {
       createdAt: Date.now(),
     };
 
+    // Update messages first
     setMessages((prev) => [...prev, userMessage, assistantMessage]);
-    setIsGenerating(true);
+    
+    // Then start the subscription
+    const subscriptionInput = {
+      prompt: values.input,
+      model: "mock-model",
+      chat: [
+        { role: "user" as const, content: values.input }
+      ]
+    };
+    
+    setCurrentInput(subscriptionInput);
+    isGeneratingRef.current = true;
     form.reset();
-  }
-
-  // Stop generating when response is complete
-  useEffect(() => {
-    const lastMessage = messages[messages.length - 1];
-    if (lastMessage?.role === "assistant" && lastMessage.text.includes("[Response complete]")) {
-      setIsGenerating(false);
-    }
-  }, [messages]);
+  }, [form]);
 
   return (
     <div className="flex flex-col w-full max-w-xl py-24 mx-auto stretch">
