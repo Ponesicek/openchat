@@ -19,6 +19,11 @@ export default function Message({ message }: { message: message }) {
           {file.size}
         </div>
       ))}
+      {Object.entries(message.additionalOutputParams).map(([key, value]) => (
+        <div key={`${message.id}-${key}`}>
+          {key}: {JSON.stringify(value, null, 2)}
+        </div>
+      ))}
     </div>
   );
 }
