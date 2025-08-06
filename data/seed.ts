@@ -1,6 +1,6 @@
-import { db } from "../src/server/db";
-import * as schema from "../src/server/db/schema";
-import { config } from "../src/server/db/json";
+import { db } from "../src/db";
+import * as schema from "../src/db/schema";
+import { config } from "../src/db/json";
 
 async function main() {
   config.set("connection", {

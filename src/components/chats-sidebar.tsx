@@ -12,8 +12,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { useState } from "react";
-import type { message } from "@/types";
 
 const chats = [
   {
@@ -42,10 +40,6 @@ const chats = [
     icon: Settings,
   },
 ];
-
-function FetchChats() {
-  const [chats, setChats] = useState<message[]>([]);
-}
 
 export function ChatsSidebar() {
   return (

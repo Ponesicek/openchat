@@ -1,6 +1,6 @@
 import Conf from "conf";
 
 export const config = new Conf({
-  projectName: "chat-app",
+  projectName: "openchat",
   cwd: process.cwd() + "/data",
 });
