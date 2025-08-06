@@ -1,18 +1,18 @@
-'use client';
+"use client";
 
-import InputBox from '@/components/inputbox';
-import Message from '@/components/message';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from "zod"
-import { useState, useCallback, useRef } from 'react';
-import type { message } from '@/types';
-import { api } from '@/trpc/react';
-import { skipToken } from '@tanstack/react-query';
+import InputBox from "@/components/inputbox";
+import Message from "@/components/message";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { useState, useCallback, useRef } from "react";
+import type { message } from "@/types";
+import { api } from "@/trpc/react";
+import { skipToken } from "@tanstack/react-query";
 
 const formSchema = z.object({
   input: z.string().min(1),
-})
+});
 
 export default function Chat() {
   // For the form
@@ -21,24 +21,24 @@ export default function Chat() {
     defaultValues: {
       input: "",
     },
-  })
+  });
 
   // Message array
-  const [messages, setMessages] = useState<message[]>([])
-  
+  const [messages, setMessages] = useState<message[]>([]);
+
   // Current input for the subscription
   const [currentInput, setCurrentInput] = useState<{
-    prompt: string,
-    model: string,
-    chat: { role: "user" | "assistant" | "system", content: string }[]
-  } | null>(null)
-  
+    prompt: string;
+    model: string;
+    chat: { role: "user" | "assistant" | "system"; content: string }[];
+  } | null>(null);
+
   // Use ref to track if we're currently generating to avoid state-based re-renders
-  const isGeneratingRef = useRef(false)
+  const isGeneratingRef = useRef(false);
 
   // Create subscription
   const generate = api.lmstudio.generate.useSubscription(
-    currentInput ?? skipToken, 
+    currentInput ?? skipToken,
     {
       onData: (data) => {
         if (data.done) {
@@ -53,95 +53,104 @@ export default function Chat() {
           setMessages((prev) => {
             const lastMessage = prev[prev.length - 1];
             if (!lastMessage) return prev;
-            return [...prev.slice(0, -1), {
-              ...lastMessage,
-              additionalOutputParams: {
-                ...lastMessage.additionalOutputParams,
-                ...params,
+            return [
+              ...prev.slice(0, -1),
+              {
+                ...lastMessage,
+                additionalOutputParams: {
+                  ...lastMessage.additionalOutputParams,
+                  ...params,
+                },
               },
-            }];
+            ];
           });
         } else {
           setMessages((prev) => {
             const lastMessage = prev[prev.length - 1];
             if (!lastMessage || lastMessage.role !== "assistant") return prev;
-            return [...prev.slice(0, -1), {
-              ...lastMessage,
-              text: lastMessage.text + data.content,
-            }];
+            return [
+              ...prev.slice(0, -1),
+              {
+                ...lastMessage,
+                text: lastMessage.text + data.content,
+              },
+            ];
           });
         }
       },
       onError: (error) => {
-        console.error('Subscription error:', error);
+        console.error("Subscription error:", error);
         setCurrentInput(null);
         isGeneratingRef.current = false;
       },
       onComplete: () => {
         setCurrentInput(null);
         isGeneratingRef.current = false;
-      }
-    }
+      },
+    },
   );
 
-  const onSubmit = useCallback((values: z.infer<typeof formSchema>) => {
-    if (isGeneratingRef.current) return; // Prevent multiple submissions
-    
-    const userMessage: message = {
-      id: Date.now(),
-      role: "user",
-      reasoning: "",
-      text: values.input,
-      tool_calls: [],
-      files: [],
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-      additionalInputParams: {},
-      additionalOutputParams: {},
-    };
+  const onSubmit = useCallback(
+    (values: z.infer<typeof formSchema>) => {
+      if (isGeneratingRef.current) return; // Prevent multiple submissions
 
-    const assistantMessage: message = {
-      id: Date.now() + 1,
-      role: "assistant",
-      reasoning: "",
-      text: "",
-      tool_calls: [],
-      files: [],
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-      additionalInputParams: {},
-      additionalOutputParams: {},
-    };
-
-    // Update messages first and get the updated messages for the subscription
-    setMessages((prev) => {
-      const updatedMessages = [...prev, userMessage, assistantMessage];
-      
-
-      
-      // Create subscription input with the updated messages
-      const subscriptionInput = {
-        prompt: values.input,
-        model: "openai/gpt-oss-20b",
-        chat: updatedMessages.map(message => ({
-          role: message.role,
-          content: message.text
-        })).slice(0, -2)
+      const userMessage: message = {
+        id: Date.now(),
+        role: "user",
+        reasoning: "",
+        text: values.input,
+        tool_calls: [],
+        files: [],
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+        additionalInputParams: {},
+        additionalOutputParams: {},
       };
-      
-      // Set the subscription input
-      setCurrentInput(subscriptionInput);
-      isGeneratingRef.current = true;
-      
-      return updatedMessages;
-    });
-    
-    form.reset();
-  }, [form]);
+
+      const assistantMessage: message = {
+        id: Date.now() + 1,
+        role: "assistant",
+        reasoning: "",
+        text: "",
+        tool_calls: [],
+        files: [],
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+        additionalInputParams: {},
+        additionalOutputParams: {},
+      };
+
+      // Update messages first and get the updated messages for the subscription
+      setMessages((prev) => {
+        const updatedMessages = [...prev, userMessage, assistantMessage];
+
+        // Create subscription input with the updated messages
+        const subscriptionInput = {
+          prompt: values.input,
+          model: "openai/gpt-oss-20b",
+          chat: updatedMessages
+            .map((message) => ({
+              role: message.role,
+              content: message.text,
+            }))
+            .slice(0, -2),
+        };
+
+        // Set the subscription input
+        setCurrentInput(subscriptionInput);
+        isGeneratingRef.current = true;
+
+        return updatedMessages;
+      });
+
+      form.reset();
+    },
+    [form],
+  );
 
   return (
-    <div className="flex flex-col w-full max-w-xl py-24 mx-auto stretch">
-      {messages.map(message => (
+    <div className="stretch mx-auto flex w-full max-w-xl flex-col py-24">
+      {messages.map((message) => (
         <Message key={message.id} message={message} />
       ))}
       <InputBox form={form} onSubmit={onSubmit} />

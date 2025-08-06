@@ -17,19 +17,15 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body
-        className="antialiased"
-      >
-      <main >
-        <TRPCReactProvider>
-      <SidebarProvider>
-      <ChatsSidebar />
-        <div className="w-full"  >
-        {children}
-        </div> 
-    </SidebarProvider>
-    </TRPCReactProvider>
-      </main>
+      <body className="antialiased">
+        <main>
+          <TRPCReactProvider>
+            <SidebarProvider>
+              <ChatsSidebar />
+              <div className="w-full">{children}</div>
+            </SidebarProvider>
+          </TRPCReactProvider>
+        </main>
       </body>
     </html>
   );

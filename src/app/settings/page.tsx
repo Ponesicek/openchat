@@ -6,24 +6,22 @@ import { ModelSelector } from "./selector";
 import { openai } from "@ai-sdk/openai";
 
 export default function Settings() {
-
-    console.log(openai.languageModel("gpt-4o"))
-    const [provider, setProvider] = useState("lmstudio")
-    const [model, setModel] = useState("gemma-3n-e4b")
-    const [api, setApi] = useState("vercel-ai-sdk")
-    useEffect(() => {
-        const provider = localStorage.getItem("provider")
-        const model = localStorage.getItem("model")
-        if (provider) setProvider(provider)
-        if (model) setModel(model)
-    }, [])
-
+  console.log(openai.languageModel("gpt-4o"));
+  const [provider, setProvider] = useState("lmstudio");
+  const [model, setModel] = useState("gemma-3n-e4b");
+  const [api, setApi] = useState("vercel-ai-sdk");
+  useEffect(() => {
+    const provider = localStorage.getItem("provider");
+    const model = localStorage.getItem("model");
+    if (provider) setProvider(provider);
+    if (model) setModel(model);
+  }, []);
 
   return (
-    <div className="flex flex-col w-full py-6 max-w-xl mx-auto stretch">
+    <div className="stretch mx-auto flex w-full max-w-xl flex-col py-6">
       <h1 className="text-2xl font-bold">Settings</h1>
       <div className="flex flex-col gap-4">
-        <h2 className="text-lg font-bold mt-4">Connection</h2>
+        <h2 className="mt-4 text-lg font-bold">Connection</h2>
         <APISelector api={api} setApi={setApi} />
         <div className="flex flex-row gap-2">
           <div className="flex flex-col gap-2">
@@ -32,7 +30,9 @@ export default function Settings() {
           </div>
           <div className="flex flex-col gap-2">
             <h3 className="text-md font-bold">Model</h3>
-            <ModelSelector models={["gpt-4o", "gpt-4o-mini", "gemma-3n-e4b", "gemma-3-1b"]} />
+            <ModelSelector
+              models={["gpt-4o", "gpt-4o-mini", "gemma-3n-e4b", "gemma-3-1b"]}
+            />
           </div>
         </div>
       </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { Calendar, Home, Inbox, Search, Settings } from "lucide-react"
+import { Calendar, Home, Inbox, Search, Settings } from "lucide-react";
 
 import {
   Sidebar,
@@ -11,7 +11,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
 import { useState } from "react";
 import type { message } from "@/types";
 
@@ -41,17 +41,16 @@ const chats = [
     url: "#",
     icon: Settings,
   },
-]
+];
 
 function FetchChats() {
   const [chats, setChats] = useState<message[]>([]);
 }
 
-
 export function ChatsSidebar() {
   return (
     <Sidebar>
-        {/*
+      {/*
         <SidebarHeader>
             <SidebarContent>
                 <div className="flex flex-row gap-2 items-center justify-center">
@@ -67,9 +66,7 @@ export function ChatsSidebar() {
         */}
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>
-            Chats
-          </SidebarGroupLabel>
+          <SidebarGroupLabel>Chats</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {chats.map((chat) => (
@@ -87,5 +84,5 @@ export function ChatsSidebar() {
         </SidebarGroup>
       </SidebarContent>
     </Sidebar>
-  )
+  );
 }

@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { CheckIcon, ChevronsUpDownIcon } from "lucide-react"
+import { useState } from "react";
+import { CheckIcon, ChevronsUpDownIcon } from "lucide-react";
 
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import {
   Command,
   CommandEmpty,
@@ -12,12 +12,12 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/components/ui/command"
+} from "@/components/ui/command";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
+} from "@/components/ui/popover";
 
 const providers = [
   {
@@ -120,7 +120,7 @@ const providers = [
     value: "openai-compatible",
     label: "OpenAI compatible (Custom endpoint)",
   },
-]
+];
 
 const methods = [
   {
@@ -146,62 +146,71 @@ const methods = [
   {
     value: "koboldai-classic",
     label: "KoboldAI classic",
-  }
-  
-]
+  },
+];
 
-export function APISelector({api, setApi}: {api: string, setApi: (api: string) => void}) {
-    const [open, setOpen] = useState(false)
-  
-    return (
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            role="combobox"
-            aria-expanded={open}
-            className="w-[300px] justify-between"
-          >
-            {api
-              ? methods.find((m) => m.value === api)?.label
-              : "Select API..."}
-            <ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-[300px] p-0">
-          <Command>
-            <CommandInput placeholder="Search API..." />
-            <CommandList>
-              <CommandEmpty>No API found.</CommandEmpty>
-              <CommandGroup>
-                {methods.map((m) => (
-                  <CommandItem
-                    key={m.value}
-                    value={m.value}
-                    onSelect={(currentValue) => {
-                      setOpen(false)
-                      setApi(currentValue)
-                    }}
-                  >
-                    <CheckIcon
-                      className={cn(
-                        "mr-2 h-4 w-4",
-                        api === m.value ? "opacity-100" : "opacity-0"
-                      )}
-                    />
-                    {m.label}
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </CommandList>
-          </Command>
-        </PopoverContent>
-      </Popover>
-    )
-  }
+export function APISelector({
+  api,
+  setApi,
+}: {
+  api: string;
+  setApi: (api: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
 
-export function ProviderSelector({provider, setProvider}: {provider: string, setProvider: (provider: string) => void}) {
-  const [open, setOpen] = useState(false)
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          role="combobox"
+          aria-expanded={open}
+          className="w-[300px] justify-between"
+        >
+          {api ? methods.find((m) => m.value === api)?.label : "Select API..."}
+          <ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-[300px] p-0">
+        <Command>
+          <CommandInput placeholder="Search API..." />
+          <CommandList>
+            <CommandEmpty>No API found.</CommandEmpty>
+            <CommandGroup>
+              {methods.map((m) => (
+                <CommandItem
+                  key={m.value}
+                  value={m.value}
+                  onSelect={(currentValue) => {
+                    setOpen(false);
+                    setApi(currentValue);
+                  }}
+                >
+                  <CheckIcon
+                    className={cn(
+                      "mr-2 h-4 w-4",
+                      api === m.value ? "opacity-100" : "opacity-0",
+                    )}
+                  />
+                  {m.label}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+export function ProviderSelector({
+  provider,
+  setProvider,
+}: {
+  provider: string;
+  setProvider: (provider: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -229,14 +238,14 @@ export function ProviderSelector({provider, setProvider}: {provider: string, set
                   key={p.value}
                   value={p.value}
                   onSelect={(currentValue) => {
-                    setOpen(false)
-                    setProvider(currentValue)
+                    setOpen(false);
+                    setProvider(currentValue);
                   }}
                 >
                   <CheckIcon
                     className={cn(
                       "mr-2 h-4 w-4",
-                      provider === p.value ? "opacity-100" : "opacity-0"
+                      provider === p.value ? "opacity-100" : "opacity-0",
                     )}
                   />
                   {p.label}
@@ -247,56 +256,54 @@ export function ProviderSelector({provider, setProvider}: {provider: string, set
         </Command>
       </PopoverContent>
     </Popover>
-  )
+  );
 }
 
-export function ModelSelector({models}: {models: string[]}) {
-  const [open, setOpen] = useState(false)
-  const [value, setValue] = useState("")
+export function ModelSelector({ models }: { models: string[] }) {
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState("");
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-    <PopoverTrigger asChild>
-      <Button
-        variant="outline"
-        role="combobox"
-        aria-expanded={open}
-        className="w-[300px] justify-between"
-      >
-        {value
-          ? models.find((model) => model === value)
-          : "Select model..."}
-        <ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-      </Button>
-    </PopoverTrigger>
-    <PopoverContent className="w-[300px] p-0">
-      <Command>
-        <CommandInput placeholder="Search model..." />
-        <CommandList>
-          <CommandEmpty>No model found.</CommandEmpty>
-          <CommandGroup>
-            {models.map((model) => (
-              <CommandItem
-                key={model}
-                value={model}
-                onSelect={(currentValue) => {
-                  setValue(currentValue === value ? "" : currentValue)
-                  setOpen(false)
-                }}
-              >
-                <CheckIcon
-                  className={cn(
-                    "mr-2 h-4 w-4",
-                    value === model ? "opacity-100" : "opacity-0"
-                  )}
-                />
-                {model}
-              </CommandItem>
-            ))}
-          </CommandGroup>
-        </CommandList>
-      </Command>
-    </PopoverContent>
-  </Popover>
-  )
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          role="combobox"
+          aria-expanded={open}
+          className="w-[300px] justify-between"
+        >
+          {value ? models.find((model) => model === value) : "Select model..."}
+          <ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-[300px] p-0">
+        <Command>
+          <CommandInput placeholder="Search model..." />
+          <CommandList>
+            <CommandEmpty>No model found.</CommandEmpty>
+            <CommandGroup>
+              {models.map((model) => (
+                <CommandItem
+                  key={model}
+                  value={model}
+                  onSelect={(currentValue) => {
+                    setValue(currentValue === value ? "" : currentValue);
+                    setOpen(false);
+                  }}
+                >
+                  <CheckIcon
+                    className={cn(
+                      "mr-2 h-4 w-4",
+                      value === model ? "opacity-100" : "opacity-0",
+                    )}
+                  />
+                  {model}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
+  );
 }
