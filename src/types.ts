@@ -14,6 +14,9 @@ export interface message {
         size: number;
     }[];
     createdAt: number;
+    updatedAt: number;
+    additionalInputParams: Record<string, unknown>;
+    additionalOutputParams: Record<string, unknown>;
 }
 
 export interface chat {

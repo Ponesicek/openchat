@@ -115,3 +115,17 @@ export const textModelsProviders = sqliteTable("textModelsProviders", {
   fallbackModel: text().notNull(),
   postProcess: integer().notNull(),
 });
+
+export const Messages = sqliteTable("messages", {
+  id: integer().primaryKey(),
+  chatId: integer().references(() => chats.id),
+  role: text().notNull(),
+  content: text().notNull(),
+  reasoning: text(),
+  toolCalls: text('', { mode: 'json' }),
+  files: text('', { mode: 'json' }),
+  additionalInputParams: text('', { mode: 'json' }),
+  additionalOutputParams: text('', { mode: 'json' }),
+  createdAt: integer().notNull().default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: integer().notNull().default(sql`CURRENT_TIMESTAMP`),
+});
