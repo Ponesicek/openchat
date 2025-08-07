@@ -10,6 +10,10 @@ export default function Message({ message }: { message: UIMessage }) {
           return <div className="bg-accent" key={`${message.id}-${i}`}>{part.text}</div>;
         case 'text':
           return <div key={`${message.id}-${i}`}>{part.text}</div>;
+        case 'tool-generateImage':
+          return                   <pre key={`${message.id}-${i}`}>
+          {JSON.stringify(part, null, 2)}
+        </pre>;
       }
     })}
   </div>

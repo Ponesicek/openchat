@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { APISelector, ProviderSelector } from "./selector";
+import { ProviderSelector } from "./selector";
 import { ModelSelector } from "./selector";
 import { openai } from "@ai-sdk/openai";
 
@@ -9,7 +9,6 @@ export default function Settings() {
   console.log(openai.languageModel("gpt-4o"));
   const [provider, setProvider] = useState("lmstudio");
   const [model, setModel] = useState("gemma-3n-e4b");
-  const [api, setApi] = useState("vercel-ai-sdk");
   useEffect(() => {
     const provider = localStorage.getItem("provider");
     const model = localStorage.getItem("model");
@@ -22,7 +21,6 @@ export default function Settings() {
       <h1 className="text-2xl font-bold">Settings</h1>
       <div className="flex flex-col gap-4">
         <h2 className="mt-4 text-lg font-bold">Connection</h2>
-        <APISelector api={api} setApi={setApi} />
         <div className="flex flex-row gap-2">
           <div className="flex flex-col gap-2">
             <h3 className="text-md font-bold">Provider</h3>

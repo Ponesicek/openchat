@@ -9,14 +9,14 @@ importers:
   .:
     dependencies:
       '@ai-sdk/openai':
-        specifier: ^2.0.3
-        version: 2.0.3(zod@4.0.15)
+        specifier: ^2.0.4
+        version: 2.0.4(zod@4.0.15)
       '@ai-sdk/openai-compatible':
         specifier: ^1.0.2
         version: 1.0.2(zod@4.0.15)
       '@ai-sdk/react':
-        specifier: ^2.0.4
-        version: 2.0.4(react@19.1.0)(zod@4.0.15)
+        specifier: ^2.0.5
+        version: 2.0.5(react@19.1.0)(zod@4.0.15)
       '@hookform/resolvers':
         specifier: ^5.2.1
         version: 5.2.1(react-hook-form@7.62.0(react@19.1.0))
@@ -48,8 +48,11 @@ importers:
         specifier: ^1.2.7
         version: 1.2.7(@types/react-dom@19.1.7(@types/react@19.1.9))(@types/react@19.1.9)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       ai:
-        specifier: ^5.0.4
-        version: 5.0.4(zod@4.0.15)
+        specifier: ^5.0.5
+        version: 5.0.5(zod@4.0.15)
+      automatic1111-provider:
+        specifier: ^0.1.1
+        version: 0.1.1(ai@5.0.5(zod@4.0.15))
       babel-plugin-react-compiler:
         specifier: 19.1.0-rc.2
         version: 19.1.0-rc.2
@@ -100,25 +103,25 @@ importers:
         version: 4.0.15
     devDependencies:
       '@eslint/eslintrc':
-        specifier: ^3
+        specifier: ^3.3.1
         version: 3.3.1
       '@tailwindcss/postcss':
-        specifier: ^4
+        specifier: ^4.1.11
         version: 4.1.11
       '@types/node':
-        specifier: ^20
+        specifier: ^20.19.9
         version: 20.19.9
       '@types/react':
-        specifier: ^19
+        specifier: ^19.1.9
         version: 19.1.9
       '@types/react-dom':
-        specifier: ^19
+        specifier: ^19.1.7
         version: 19.1.7(@types/react@19.1.9)
       drizzle-kit:
         specifier: ^0.31.4
         version: 0.31.4
       eslint:
-        specifier: ^9
+        specifier: ^9.32.0
         version: 9.32.0(jiti@2.5.1)
       eslint-config-next:
         specifier: 15.4.5
@@ -130,13 +133,13 @@ importers:
         specifier: ^0.6.14
         version: 0.6.14(prettier@3.6.2)
       tailwindcss:
-        specifier: ^4
+        specifier: ^4.1.11
         version: 4.1.11
       tsx:
         specifier: ^4.20.3
         version: 4.20.3
       typescript:
-        specifier: ^5
+        specifier: ^5.9.2
         version: 5.9.2
       typescript-eslint:
         specifier: ^8.39.0
@@ -144,8 +147,8 @@ importers:
 
 packages:
 
-  '@ai-sdk/gateway@1.0.2':
-    resolution: {integrity: sha512-RCE6v6/7JMzSHmjB0R7oWT54y/VYeEv+6NYLtkQKdxN871UawFFHpL7TW7IRnn+/SHdRlr7XoWxxGdHEaGRKiA==}
+  '@ai-sdk/gateway@1.0.3':
+    resolution: {integrity: sha512-QRGz2vH1WR9NvCv8gWocoebAKiXcuqj22mug6i8COeVsp33x5K5cK2DT4TwiQx5SfYbqJbVoBT+UqnHF7A3PHA==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.25.76 || ^4
@@ -156,8 +159,8 @@ packages:
     peerDependencies:
       zod: ^3.25.76 || ^4
 
-  '@ai-sdk/openai@2.0.3':
-    resolution: {integrity: sha512-W8n024wj8fZ3zZR92xueNP+zCHhpBh86+Z/Gkk4d0lLakVeOhEK7TbqZd08iJI5ba+dBWc3GCe5NP/4iLJ01YQ==}
+  '@ai-sdk/openai@2.0.4':
+    resolution: {integrity: sha512-PnVUFosX2zWk6emiX4SulZrGvGw79YJjh/DgxahpAcBpz71GlQyzVNTFAQx7ycFGLBg/YniJr1M2WJybYZZ3ug==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.25.76 || ^4
@@ -172,8 +175,8 @@ packages:
     resolution: {integrity: sha512-6o7Y2SeO9vFKB8lArHXehNuusnpddKPk7xqL7T2/b+OvXMRIXUO1rR4wcv1hAFUAT9avGZshty3Wlua/XA7TvA==}
     engines: {node: '>=18'}
 
-  '@ai-sdk/react@2.0.4':
-    resolution: {integrity: sha512-l8UkmogLx3vwIs4n7KbPLaaAq2DynSqCX78yVKbrQESYxv/0mdw0+qe+EVMPPxvG2fBjFLlImUxc33l0Dhb19w==}
+  '@ai-sdk/react@2.0.5':
+    resolution: {integrity: sha512-rXcraxZ+cAwKWS/wbCIx9gl1Ep7DNmOXTtB/U2WPSEpez4kc+A/2dwibJqRQ9wujbRv05jsTTVLUjE92Ovzhyg==}
     engines: {node: '>=18'}
     peerDependencies:
       react: ^18 || ^19 || ^19.0.0-rc
@@ -1530,8 +1533,8 @@ packages:
     engines: {node: '>=0.4.0'}
     hasBin: true
 
-  ai@5.0.4:
-    resolution: {integrity: sha512-nizyqRxFlJShCAh/xPqor9EYpuaiGqCcYqau9A2GaSL+di+Qf6pA+Hos5x1orlodmT+EciZfoC2Sq+I12OmIUg==}
+  ai@5.0.5:
+    resolution: {integrity: sha512-NPQ8Yv4lR7o/1rM+HQ0JT18zKxVFy/DrFDpvxlBQqmemSwsf3FlLNTK0asWXo9YtDAc0BOFL/y4kB56Hffi4yg==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.25.76 || ^4
@@ -1606,6 +1609,12 @@ packages:
 
   atomically@2.0.3:
     resolution: {integrity: sha512-kU6FmrwZ3Lx7/7y3hPS5QnbJfaohcIul5fGqf7ok+4KklIEk9tJ0C2IQPdacSbVUWv6zVHXEBWoWd6NrVMT7Cw==}
+
+  automatic1111-provider@0.1.1:
+    resolution: {integrity: sha512-oOm7/UFsGpOJ3NYl36o7ZLXUb7YoC2tt3UrENyz9uMTL78TPrLzV5RLjejz6rumBZOr7YVmYchAQB5CwBWVJ3w==}
+    engines: {node: '>=18.0.0'}
+    peerDependencies:
+      ai: ^5.0.0
 
   available-typed-arrays@1.0.7:
     resolution: {integrity: sha512-wvUjBtSGN7+7SjNpq/9M2Tg350UZD3q62IFZLbRAR1bSMlCo1ZaeW+BJ+D090e4hIIZLBcTDWe4Mh4jvUDajzQ==}
@@ -1890,8 +1899,8 @@ packages:
   emoji-regex@9.2.2:
     resolution: {integrity: sha512-L18DaJsXSUk2+42pv8mLs5jJT2hqFkFE4j21wOmgbUqsZ2hL72NsUU785g9RXgo3s0ZNgVl42TiHp3ZtOv/Vyg==}
 
-  enhanced-resolve@5.18.2:
-    resolution: {integrity: sha512-6Jw4sE1maoRJo3q8MsSIn2onJFbLTOjY9hlx4DZXmOKvLRd1Ok2kXmAGXaafL2+ijsJZ1ClYbl/pmqr9+k4iUQ==}
+  enhanced-resolve@5.18.3:
+    resolution: {integrity: sha512-d4lC8xfavMeBjzGr2vECC3fsGXziXZQyJxD868h2M/mBI3PwAuODxAkLkq5HYuvrPYcUtiLzsTo8U3PgX3Ocww==}
     engines: {node: '>=10.13.0'}
 
   env-paths@3.0.0:
@@ -3169,7 +3178,7 @@ packages:
 
 snapshots:
 
-  '@ai-sdk/gateway@1.0.2(zod@4.0.15)':
+  '@ai-sdk/gateway@1.0.3(zod@4.0.15)':
     dependencies:
       '@ai-sdk/provider': 2.0.0
       '@ai-sdk/provider-utils': 3.0.1(zod@4.0.15)
@@ -3181,7 +3190,7 @@ snapshots:
       '@ai-sdk/provider-utils': 3.0.1(zod@4.0.15)
       zod: 4.0.15
 
-  '@ai-sdk/openai@2.0.3(zod@4.0.15)':
+  '@ai-sdk/openai@2.0.4(zod@4.0.15)':
     dependencies:
       '@ai-sdk/provider': 2.0.0
       '@ai-sdk/provider-utils': 3.0.1(zod@4.0.15)
@@ -3199,10 +3208,10 @@ snapshots:
     dependencies:
       json-schema: 0.4.0
 
-  '@ai-sdk/react@2.0.4(react@19.1.0)(zod@4.0.15)':
+  '@ai-sdk/react@2.0.5(react@19.1.0)(zod@4.0.15)':
     dependencies:
       '@ai-sdk/provider-utils': 3.0.1(zod@4.0.15)
-      ai: 5.0.4(zod@4.0.15)
+      ai: 5.0.5(zod@4.0.15)
       react: 19.1.0
       swr: 2.3.4(react@19.1.0)
       throttleit: 2.1.0
@@ -4081,7 +4090,7 @@ snapshots:
   '@tailwindcss/node@4.1.11':
     dependencies:
       '@ampproject/remapping': 2.3.0
-      enhanced-resolve: 5.18.2
+      enhanced-resolve: 5.18.3
       jiti: 2.5.1
       lightningcss: 1.30.1
       magic-string: 0.30.17
@@ -4335,9 +4344,9 @@ snapshots:
 
   acorn@8.15.0: {}
 
-  ai@5.0.4(zod@4.0.15):
+  ai@5.0.5(zod@4.0.15):
     dependencies:
-      '@ai-sdk/gateway': 1.0.2(zod@4.0.15)
+      '@ai-sdk/gateway': 1.0.3(zod@4.0.15)
       '@ai-sdk/provider': 2.0.0
       '@ai-sdk/provider-utils': 3.0.1(zod@4.0.15)
       '@opentelemetry/api': 1.9.0
@@ -4448,6 +4457,13 @@ snapshots:
     dependencies:
       stubborn-fs: 1.2.5
       when-exit: 2.1.4
+
+  automatic1111-provider@0.1.1(ai@5.0.5(zod@4.0.15)):
+    dependencies:
+      '@ai-sdk/provider': 2.0.0
+      '@ai-sdk/provider-utils': 3.0.1(zod@4.0.15)
+      ai: 5.0.5(zod@4.0.15)
+      zod: 4.0.15
 
   available-typed-arrays@1.0.7:
     dependencies:
@@ -4654,7 +4670,7 @@ snapshots:
 
   emoji-regex@9.2.2: {}
 
-  enhanced-resolve@5.18.2:
+  enhanced-resolve@5.18.3:
     dependencies:
       graceful-fs: 4.2.11
       tapable: 2.2.2
