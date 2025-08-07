@@ -25,9 +25,11 @@ export default function Chat() {
   };
   return (
     <div className="stretch mx-auto flex w-full max-w-xl flex-col py-24">
-    {messages.map((message) => (
-      <Message key={message.id} message={message} />
-    ))}
+    <div className="mb-16">
+      {messages.map((message) => (
+        <Message key={message.id} message={message} />
+      ))}
+    </div>
     <InputBox form={form} onSubmit={onSubmit} />
   </div>
   );

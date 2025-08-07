@@ -11,9 +11,9 @@ export default function Message({ message }: { message: UIMessage }) {
         case 'text':
           return <div key={`${message.id}-${i}`}>{part.text}</div>;
         case 'tool-generateImage':
-          return                   <pre key={`${message.id}-${i}`}>
-          {JSON.stringify(part, null, 2)}
-        </pre>;
+          return (<div key={`${message.id}-${i}`} className="flex justify-center">
+            {part.output ? <img src={(part.output as { type: string, image: string }).image} alt="Generated image" className="w-full h-auto" /> : <pre>{JSON.stringify(part, null, 2)}</pre>}
+            </div>);
       }
     })}
   </div>
