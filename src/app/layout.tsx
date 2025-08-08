@@ -30,10 +30,10 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <main>
-            <SidebarProvider>
-              <ChatsSidebar />
-              <div className="w-full">{children}</div>
-            </SidebarProvider>
+          <SidebarProvider>
+            <ChatsSidebar />
+            <div className="w-full">{children}</div>
+          </SidebarProvider>
         </main>
       </body>
     </html>

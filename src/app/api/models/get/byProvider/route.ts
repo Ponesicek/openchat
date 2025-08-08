@@ -7,17 +7,19 @@ const lmstudioModelsResponseSchema = z.object({
       id: z.string(),
       object: z.string(),
       owned_by: z.string(),
-    })
+    }),
   ),
   object: z.string(),
 });
 
-export async function GET(request: NextRequest): Promise<NextResponse<{
-  models: {
-    name: string;
-    slug: string;
-  }[];
-}>> {
+export async function GET(request: NextRequest): Promise<
+  NextResponse<{
+    models: {
+      name: string;
+      slug: string;
+    }[];
+  }>
+> {
   const { searchParams } = new URL(request.url);
   const provider = searchParams.get("provider");
   const url = searchParams.get("url");
@@ -25,7 +27,9 @@ export async function GET(request: NextRequest): Promise<NextResponse<{
     return NextResponse.json({ models: [] }, { status: 400 });
   }
   if (provider === "lmstudio") {
-    const response = await fetch(url ? url+"/v1/models" : "http://127.0.0.1:1234/v1/models");
+    const response = await fetch(
+      url ? url + "/v1/models" : "http://127.0.0.1:1234/v1/models",
+    );
     const data = await response.json();
     const parsedData = lmstudioModelsResponseSchema.parse(data);
     const models = parsedData.data.map((model) => ({
