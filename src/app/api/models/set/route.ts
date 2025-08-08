@@ -3,8 +3,8 @@ import { config } from "@/db/json";
 import { z } from "zod";
 
 const setModelSchema = z.object({
-    type: z.enum(["LLMModel", "LLMProvider", "ImageModel", "ImageProvider"]),
-    value: z.string().min(1),
+  type: z.enum(["LLMModel", "LLMProvider", "ImageModel", "ImageProvider"]),
+  value: z.string().min(1),
 });
 
 export async function POST(request: NextRequest) {

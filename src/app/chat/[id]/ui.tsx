@@ -29,15 +29,15 @@ const getModels = async () => {
   const response = await fetch("/api/models/byProvider");
   const data = await response.json();
   return data.models;
-}
-
+};
 
 export default function Chat({
   id,
   initialMessages,
 }: { id?: string | undefined; initialMessages?: UIMessage[] } = {}) {
-  const query = useQuery({ queryKey: ['models'], queryFn: getModels })
-  const models: { name: string, slug: string, selected: boolean }[] = query.data ?? [];
+  const query = useQuery({ queryKey: ["models"], queryFn: getModels });
+  const models: { name: string; slug: string; selected: boolean }[] =
+    query.data ?? [];
   const [text, setText] = useState<string>("");
   const [model, setModel] = useState<string>("");
 
@@ -48,7 +48,7 @@ export default function Chat({
 
   useEffect(() => {
     if (!model && models.length > 0) {
-      const defaultModel = models.find(m => m.selected) ?? models[0] ?? null;
+      const defaultModel = models.find((m) => m.selected) ?? models[0] ?? null;
       if (defaultModel) setModel(defaultModel.name);
     }
   }, [models, model]);
@@ -96,9 +96,9 @@ export default function Chat({
                   setModel(value);
                   fetch("/api/models/set", {
                     method: "POST",
-                    body: JSON.stringify({ type: "LLMModel", value: value })
+                    body: JSON.stringify({ type: "LLMModel", value: value }),
                   });
-                  toast("Model has been selected.")
+                  toast("Model has been selected.");
                 }}
                 value={model}
               >
@@ -106,19 +106,25 @@ export default function Chat({
                   onMouseEnter={() => {
                     query.refetch();
                   }}
-                  >
+                >
                   <PromptInputModelSelectValue />
                 </PromptInputModelSelectTrigger>
                 <PromptInputModelSelectContent>
                   {models.map((model) => (
-                    <PromptInputModelSelectItem key={model.name} value={model.name}>
+                    <PromptInputModelSelectItem
+                      key={model.name}
+                      value={model.name}
+                    >
                       {model.name}
                     </PromptInputModelSelectItem>
                   ))}
                 </PromptInputModelSelectContent>
               </PromptInputModelSelect>
             </PromptInputTools>
-            <PromptInputSubmit disabled={!text || !model || query.isLoading} status={status} />
+            <PromptInputSubmit
+              disabled={!text || !model || query.isLoading}
+              status={status}
+            />
           </PromptInputToolbar>
         </PromptInput>
       </div>

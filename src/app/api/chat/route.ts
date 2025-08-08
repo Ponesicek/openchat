@@ -13,7 +13,7 @@ export const maxDuration = 30;
 
 export async function POST(req: Request) {
   const { messages, id }: { messages: UIMessage[]; id: string } =
-  await req.json();
+    await req.json();
 
   console.log(id);
   const lmstudio = createOpenAICompatible({

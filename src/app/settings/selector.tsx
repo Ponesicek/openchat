@@ -178,7 +178,13 @@ export function ProviderSelector({
   );
 }
 
-export function ModelSelector({ models, setModel }: { models: { name: string, slug: string, selected: boolean }[], setModel: (model: string) => void }) {
+export function ModelSelector({
+  models,
+  setModel,
+}: {
+  models: { name: string; slug: string; selected: boolean }[];
+  setModel: (model: string) => void;
+}) {
   const [open, setOpen] = useState(false);
   console.log("from model selector", models);
 
@@ -191,7 +197,9 @@ export function ModelSelector({ models, setModel }: { models: { name: string, sl
           aria-expanded={open}
           className="w-[300px] justify-between"
         >
-          {models ? models.find((model) => model.selected)?.name : "Select model..."}
+          {models
+            ? models.find((model) => model.selected)?.name
+            : "Select model..."}
           <ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>

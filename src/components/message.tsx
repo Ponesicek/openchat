@@ -42,7 +42,11 @@ function AIMessage({ message }: { message: UIMessage }) {
         switch (part.type) {
           case "reasoning":
             return (
-              <Reasoning key={`${message.id}-${i}`} className="w-full" isStreaming={false}>
+              <Reasoning
+                key={`${message.id}-${i}`}
+                className="w-full"
+                isStreaming={false}
+              >
                 <ReasoningTrigger />
                 <ReasoningContent>{part.text}</ReasoningContent>
               </Reasoning>
@@ -74,7 +78,8 @@ function AIMessage({ message }: { message: UIMessage }) {
                               }
                             ).prompt
                           : "Generating image..."}
-                      </TaskItemFile> <br />
+                      </TaskItemFile>{" "}
+                      <br />
                       <TaskItemFile className="text-red-500">
                         {part.input
                           ? (

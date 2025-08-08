@@ -1,5 +1,5 @@
-import { loadChat } from '@/util/chat-store';
-import Chat from './ui';
+import { loadChat } from "@/util/chat-store";
+import Chat from "./ui";
 
 export default async function Page(props: { params: Promise<{ id: string }> }) {
   const { id } = await props.params; // get the chat ID from the URL

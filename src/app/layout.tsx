@@ -32,8 +32,8 @@ export default function RootLayout({
       >
         <main>
           <ReactQueryProvider>
-          <SidebarProvider>
-            <ChatsSidebar />
+            <SidebarProvider>
+              <ChatsSidebar />
               <div className="w-full">{children}</div>
             </SidebarProvider>
           </ReactQueryProvider>
