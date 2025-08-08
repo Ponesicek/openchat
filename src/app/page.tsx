@@ -1,36 +1,104 @@
 "use client";
 
+import {
+  PromptInput,
+  PromptInputButton,
+  PromptInputModelSelect,
+  PromptInputModelSelectContent,
+  PromptInputModelSelectItem,
+  PromptInputModelSelectTrigger,
+  PromptInputModelSelectValue,
+  PromptInputSubmit,
+  PromptInputTextarea,
+  PromptInputToolbar,
+  PromptInputTools,
+} from "@/components/ai-elements/prompt-input";
+import { GlobeIcon, MicIcon } from "lucide-react";
+import { useState } from "react";
 import { useChat } from "@ai-sdk/react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import InputBox from "@/components/inputbox";
+import {
+  Conversation,
+  ConversationContent,
+  ConversationScrollButton,
+} from "@/components/ai-elements/conversation";
+import { MessageContent } from "@/components/ai-elements/message";
+import { Response } from "@/components/ai-elements/response";
 import Message from "@/components/message";
 
-const formSchema = z.object({
-  input: z.string().min(1),
-});
+const models = [
+  { id: "llama-3some-8b-v2", name: "Llama 3some 8b v2" },
+  { id: "claude-opus-4-20250514", name: "Claude 4 Opus" },
+];
 
-export default function Chat() {
-  const { messages, sendMessage } = useChat();
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      input: "",
-    },
-  });
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    sendMessage({ text: values.input });
-    form.reset();
+const InputDemo = () => {
+  const [text, setText] = useState<string>("");
+  const [model, setModel] = useState<string>(models[0]?.id ?? "");
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    sendMessage(
+      { text: text },
+      {
+        body: {
+          model: model,
+        },
+      },
+    );
+    setText("");
   };
+
+  const { messages, status, sendMessage } = useChat();
+
   return (
-    <div className="stretch mx-auto flex w-full max-w-xl flex-col py-24">
-      <div className="mb-16">
-        {messages.map((message) => (
-          <Message key={message.id} message={message} />
-        ))}
+    <div className="relative top-56 mx-auto size-full h-[900px] max-w-4xl rounded-lg border p-6">
+      <div className="flex h-full flex-col">
+        <Conversation>
+          <ConversationContent>
+            {messages.map((message) => (
+              <Message message={message} key={message.id} />
+            ))}
+          </ConversationContent>
+          <ConversationScrollButton />
+        </Conversation>
+
+        <PromptInput onSubmit={handleSubmit} className="mt-4">
+          <PromptInputTextarea
+            onChange={(e) => setText(e.target.value)}
+            value={text}
+          />
+          <PromptInputToolbar>
+            <PromptInputTools>
+              <PromptInputButton>
+                <MicIcon size={16} />
+              </PromptInputButton>
+              <PromptInputButton>
+                <GlobeIcon size={16} />
+                <span>Search</span>
+              </PromptInputButton>
+              <PromptInputModelSelect
+                onValueChange={(value) => {
+                  setModel(value);
+                }}
+                value={model}
+              >
+                <PromptInputModelSelectTrigger>
+                  <PromptInputModelSelectValue />
+                </PromptInputModelSelectTrigger>
+                <PromptInputModelSelectContent>
+                  {models.map((model) => (
+                    <PromptInputModelSelectItem key={model.id} value={model.id}>
+                      {model.name}
+                    </PromptInputModelSelectItem>
+                  ))}
+                </PromptInputModelSelectContent>
+              </PromptInputModelSelect>
+            </PromptInputTools>
+            <PromptInputSubmit disabled={!text} status={status} />
+          </PromptInputToolbar>
+        </PromptInput>
       </div>
-      <InputBox form={form} onSubmit={onSubmit} />
     </div>
   );
-}
+};
+
+export default InputDemo;

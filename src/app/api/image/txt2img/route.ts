@@ -12,6 +12,8 @@ export async function POST(req: Request) {
     options: { size: string; steps: number; cfg_scale: number };
   };
   const { prompt, negative_prompt, options } = body;
+  const config = await fetch(process.env.NEXT_PUBLIC_URL + "/api/config/get");
+  const configData = await config.json();
   const automatic1111 = createAutomatic1111({
     baseURL: "http://127.0.0.1:7860",
   });
@@ -21,7 +23,7 @@ export async function POST(req: Request) {
   }
 
   const { image } = await generateImage({
-    model: automatic1111.image("oneObsession_v16Noobai"), // Default Automatic1111 model
+    model: automatic1111.image(configData.connection.imageModel),
     prompt: prompt,
     size: `${size[0]}x${size[1]}` as `${number}x${number}`,
     providerOptions: {

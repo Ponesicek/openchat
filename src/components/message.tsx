@@ -2,60 +2,111 @@ import type { UIMessage } from "ai";
 import { Image } from "@/components/ai-elements/image";
 import { Response } from "@/components/ai-elements/response";
 import {
-  Tool,
-  ToolContent,
-  ToolHeader,
-  ToolInput,
-  ToolOutput,
-} from "@/components/ai-elements/tool";
+  MessageContent,
+  Message as MessageElement,
+} from "@/components/ai-elements/message";
+import {
+  Reasoning,
+  ReasoningContent,
+  ReasoningTrigger,
+} from "@/components/ai-elements/reasoning";
+import {
+  Task,
+  TaskContent,
+  TaskItem,
+  TaskItemFile,
+  TaskTrigger,
+} from "@/components/ai-elements/task";
 
-export default function Message({ message }: { message: UIMessage }) {
+function UserMessage({ message }: { message: UIMessage }) {
+  return (
+    <MessageElement from="user">
+      <MessageContent>
+        {message.parts.map((part, i) => {
+          switch (part.type) {
+            case "text":
+              return (
+                <Response key={`${message.id}-${i}`}>{part.text}</Response>
+              );
+          }
+        })}
+      </MessageContent>
+    </MessageElement>
+  );
+}
+
+function AIMessage({ message }: { message: UIMessage }) {
   return (
     <div key={message.id} className="whitespace-pre-wrap">
-      {message.role === "user" ? "User: " : "AI: "}
       {message.parts.map((part, i) => {
         switch (part.type) {
           case "reasoning":
             return (
-              <div className="bg-accent" key={`${message.id}-${i}`}>
-                {part.text}
-              </div>
+              <Reasoning className="w-full" isStreaming={false}>
+                <ReasoningTrigger />
+                <ReasoningContent>{part.text}</ReasoningContent>
+              </Reasoning>
             );
           case "text":
             return <Response key={`${message.id}-${i}`}>{part.text}</Response>;
           case "tool-generateImage":
-            if (part.output) {
-              console.log("part.output", (part.output as any).image.base64Data);
-            }
             return (
-              <div key={`${message.id}-${i}`} className="flex justify-center">
-                {part.output ? (
-                  <Image
-                    base64={(part.output as any).image.base64Data}
-                    mediaType="image/png"
-                    uint8Array={(part.output as any).image.uint8Array}
-                    alt="Generated image"
-                    className="aspect-square border"
-                  />
-                ) : (
-                  <Tool>
-                    <ToolHeader
-                      type="tool-call"
-                      state={"output-available" as const}
-                    />
-                    <ToolContent>
-                      <ToolInput input="Input to tool call" />
-                      <ToolOutput
-                        errorText="Error"
-                        output="Output from tool call"
-                      />
-                    </ToolContent>
-                  </Tool>
-                )}
+              <div
+                key={`${message.id}-${i}`}
+                className="flex flex-col justify-center"
+              >
+                <Task className="mb-4 w-full">
+                  <TaskTrigger title="Generating image..." />
+                  <TaskContent>
+                    <TaskItem>
+                      Generating image{" "}
+                      <TaskItemFile>
+                        {part.input
+                          ? (
+                              part.input as {
+                                prompt: string;
+                                negative_prompt: string;
+                                options: {
+                                  size: string;
+                                  steps: number;
+                                  cfg_scale: number;
+                                };
+                              }
+                            ).prompt
+                          : "Generating image..."}
+                      </TaskItemFile>
+                    </TaskItem>
+                    <TaskItem>
+                      {part.output ? (
+                        <Image
+                          base64={(part.output as any).image.base64Data}
+                          mediaType="image/png"
+                          uint8Array={(part.output as any).image.uint8Array}
+                          alt="Generated image"
+                          className="w-52"
+                        />
+                      ) : (
+                        <div></div>
+                      )}
+                    </TaskItem>
+                  </TaskContent>
+                </Task>
               </div>
             );
         }
       })}
+    </div>
+  );
+}
+
+export default function Message({ message }: { message: UIMessage }) {
+  return (
+    <div key={message.id}>
+      {message.role === "user" ? (
+        <UserMessage message={message} />
+      ) : (
+        <AIMessage message={message} />
+      )}
     </div>
   );
 }
