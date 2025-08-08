@@ -40,7 +40,6 @@ export async function POST(req: Request) {
         reasoning: "high",
       },
     },
-
     system: systemData,
     tools: tools,
   });

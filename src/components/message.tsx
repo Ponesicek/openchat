@@ -1,4 +1,4 @@
-import type { UIMessage } from "ai";
+import type { GeneratedFile, UIMessage } from "ai";
 import { Image } from "@/components/ai-elements/image";
 import { Response } from "@/components/ai-elements/response";
 import {
@@ -59,8 +59,8 @@ function AIMessage({ message }: { message: UIMessage }) {
                   <TaskTrigger title="Generating image..." />
                   <TaskContent>
                     <TaskItem>
-                      Generating image{" "}
-                      <TaskItemFile>
+                      Generating image <br />
+                      <TaskItemFile className="mb-2 text-green-500">
                         {part.input
                           ? (
                               part.input as {
@@ -74,17 +74,35 @@ function AIMessage({ message }: { message: UIMessage }) {
                               }
                             ).prompt
                           : "Generating image..."}
+                      </TaskItemFile> <br />
+                      <TaskItemFile className="text-red-500">
+                        {part.input
+                          ? (
+                              part.input as {
+                                prompt: string;
+                                negative_prompt: string;
+                                options: {
+                                  size: string;
+                                  steps: number;
+                                  cfg_scale: number;
+                                };
+                              }
+                            ).negative_prompt
+                          : "Generating image..."}
                       </TaskItemFile>
                     </TaskItem>
                     <TaskItem>
                       {part.output ? (
-                        <Image
-                          base64={(part.output as any).image.base64Data}
-                          mediaType="image/png"
-                          uint8Array={(part.output as any).image.uint8Array}
-                          alt="Generated image"
-                          className="w-52"
-                        />
+                        (() => {
+                          const img: GeneratedFile = (part.output as any).image;
+                          return (
+                            <Image
+                              {...img}
+                              alt="Generated image"
+                              className="w-52"
+                            />
+                          );
+                        })()
                       ) : (
                         <div></div>
                       )}

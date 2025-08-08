@@ -45,6 +45,10 @@ export async function POST(req: Request) {
   return Response.json({
     location:
       process.env.NEXT_PUBLIC_URL + "/api/image/get?location=" + location,
-    image: image,
+    image: {
+      base64: image?.base64 ?? "",
+      mediaType: image?.mediaType ?? "image/png",
+      uint8Array: image?.uint8Array ?? new Uint8Array(),
+    },
   });
 }
