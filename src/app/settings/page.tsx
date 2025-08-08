@@ -11,12 +11,6 @@ const getModels = async () => {
   const data = await response.json();
   return data;
 }
-const getProvider = async () => {
-  const response = await fetch("/api/config/get");
-  const data = await response.json();
-  return data.connection.LLMProvider;
-}
-
 
 export default function Settings() {
   const query = useQuery({ queryKey: ['models'], queryFn: getModels })

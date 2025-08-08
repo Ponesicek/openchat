@@ -1,14 +1,22 @@
-import { db } from "../src/db";
-import * as schema from "../src/db/schema";
 import { config } from "../src/db/json";
+import fs from "fs";
+import path from "path";
 
 async function main() {
+  config.set("constants", {
+    char: "Helpful, professional assistant who communicates clearly and respectfully.",
+    user: "user",
+  });
+
   config.set("connection", {
-    provider: "LMStudio",
+    LLMProvider: "lmstudio",
+    LLMModel: "openai/gpt-oss-20b",
+    imageProvider: "Automatic1111",
+    imageModel: "plantMilkModelSuite_hempII",
   });
   config.set("AI", {
     defaultPrompt:
-      "Write {{char}}'s next reply in a fictional chat between {{char}} and {{user}}.",
+      "Write {{char}}'s next reply in a conversation between {{char}} and {{user}}.",
   });
   config.set("LoreBook", {
     scanDepth: 2,
@@ -26,22 +34,29 @@ async function main() {
     insertionStrategy: "CLF",
   });
 
-  const OpenAI: typeof schema.textModelsProviders.$inferInsert = {
-    name: "OpenAI",
-    apiUrl: "https://api.openai.com/v1",
-    defaultModel: "gpt-4o",
-    fallbackModel: "gpt-4o-mini",
-    postProcess: 0,
-  };
-  const LMStudio: typeof schema.textModelsProviders.$inferInsert = {
-    name: "LMStudio",
-    apiUrl: "http://localhost:1234/v1",
-    defaultModel: "google/gemma-3n-e4b",
-    fallbackModel: "google/gemma-3-1b",
-    postProcess: 0,
-  };
+  config.set("generationSettings", {
+    maxOutputTokens: -1,
+    temperature: -1,
+    topP: -1,
+    topK: -1,
+    presencePenalty: -1,
+    frequencyPenalty: -1,
+    stopSequences: [],
+    seed: -1,
+    maxRetries: -1,
+    headers: {},
+  });
 
-  await db.insert(schema.textModelsProviders).values([OpenAI, LMStudio]);
+  const fileData = {
+    constants: config.get("constants"),
+    connection: config.get("connection"),
+    AI: config.get("AI"),
+    LoreBook: config.get("LoreBook"),
+    generationSettings: config.get("generationSettings"),
+  };
+  const outPath = path.join(process.cwd(), "data", "config.json");
+  fs.writeFileSync(outPath, JSON.stringify(fileData, null, 2), "utf8");
+
   console.log("Providers seeded!");
 }
 

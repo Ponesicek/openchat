@@ -42,7 +42,7 @@ function AIMessage({ message }: { message: UIMessage }) {
         switch (part.type) {
           case "reasoning":
             return (
-              <Reasoning className="w-full" isStreaming={false}>
+              <Reasoning key={`${message.id}-${i}`} className="w-full" isStreaming={false}>
                 <ReasoningTrigger />
                 <ReasoningContent>{part.text}</ReasoningContent>
               </Reasoning>

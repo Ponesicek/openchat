@@ -6,14 +6,16 @@ import {
 } from "ai";
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 import { tools } from "./tools";
+import { saveChat } from "@/util/chat-store";
 
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
 
 export async function POST(req: Request) {
-  const body = (await req.json()) as { messages: UIMessage[] };
-  const { messages } = body;
+  const { messages, id }: { messages: UIMessage[]; id: string } =
+  await req.json();
 
+  console.log(id);
   const lmstudio = createOpenAICompatible({
     name: "lmstudio",
     baseURL: "http://localhost:1234/v1",
@@ -44,5 +46,10 @@ export async function POST(req: Request) {
     tools: tools,
   });
 
-  return result.toUIMessageStreamResponse();
+  return result.toUIMessageStreamResponse({
+    originalMessages: messages,
+    onFinish: ({ messages }) => {
+      saveChat({ chatId: id, messages });
+    },
+  });
 }
