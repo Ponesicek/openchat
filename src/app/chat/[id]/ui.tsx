@@ -93,17 +93,19 @@ export default function Chat({
               </PromptInputButton>
               <PromptInputModelSelect
                 onValueChange={(value) => {
+                  if (!value || value === model) return;
                   setModel(value);
                   fetch("/api/models/set", {
                     method: "POST",
-                    body: JSON.stringify({ type: "LLMModel", value: value }),
-                  });
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ type: "LLMModel", value }),
+                  }).catch(() => {});
                   toast("Model has been selected.");
                 }}
                 value={model}
               >
                 <PromptInputModelSelectTrigger
-                  onMouseEnter={() => {
+                  onClick={() => {
                     query.refetch();
                   }}
                 >

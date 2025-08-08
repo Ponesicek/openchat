@@ -4,6 +4,13 @@ import { useEffect, useState } from "react";
 import { ProviderSelector } from "./selector";
 import { ModelSelector } from "./selector";
 import { useQuery } from "@tanstack/react-query";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card"
 
 const getModels = async () => {
   const response = await fetch("/api/models/byProvider");
@@ -11,8 +18,15 @@ const getModels = async () => {
   return data;
 };
 
+const getConfig = async () => {
+  const response = await fetch("/api/config/get");
+  const data = await response.json();
+  return data;
+};
+
 export default function Settings() {
   const query = useQuery({ queryKey: ["models"], queryFn: getModels });
+  const configQuery = useQuery({ queryKey: ["config"], queryFn: getConfig });
   const modelsList: { name: string; slug: string; selected: boolean }[] =
     query.data?.models ?? [];
   const models = modelsList;
@@ -20,6 +34,15 @@ export default function Settings() {
   const [model, setModel] = useState(
     models.find((m) => m.selected) ?? models[0] ?? null,
   );
+  const [systemPrompt, setSystemPrompt] = useState(
+    configQuery.data?.AI.defaultPrompt ?? null,
+  );
+
+  useEffect(() => {
+    if (configQuery.data) {
+      setSystemPrompt(configQuery.data.AI.defaultPrompt);
+    }
+  }, [configQuery.data]);
 
   useEffect(() => {
     if (!model && models.length > 0) {
@@ -64,6 +87,46 @@ export default function Settings() {
                 query.refetch();
               }}
             />
+          </div>
+        </div>
+      </div>
+      <div className="flex flex-col gap-4">
+      <HoverCard>
+            <HoverCardTrigger className="w-fit">
+              <h2 className="mt-4 text-lg font-bold">System prompt</h2>
+            </HoverCardTrigger>
+            <HoverCardContent>
+              <p>Available variables:</p>
+              <ul>
+                <li>{`{char} - Character name`}</li>
+                <li>{`{user} - Your persona\'s name`}</li>
+              </ul>
+            </HoverCardContent>
+          </HoverCard>
+        <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 w-full">
+            <Textarea
+              value={systemPrompt ?? ""}
+              onChange={(e) => {
+                setSystemPrompt(e.target.value);
+              }}
+              className="w-full min-h-48"
+            />
+          </div>
+          <div className="flex flex-col gap-2">
+            <Button
+              onClick={() => {
+                fetch("/api/config/set", {
+                  method: "POST",
+                  body: JSON.stringify({
+                    key: "AI.defaultPrompt",
+                    value: systemPrompt,
+                  }),
+                });
+              }}
+            >
+              Save
+            </Button>
           </div>
         </div>
       </div>

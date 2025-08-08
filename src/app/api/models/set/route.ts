@@ -8,7 +8,17 @@ const setModelSchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
-  const { type, value } = setModelSchema.parse(await request.json());
-  config.set(`connection.${type}`, value);
-  return NextResponse.json({ message: "Model set successfully" });
+  try {
+    const { type, value } = setModelSchema.parse(await request.json());
+    config.set(`connection.${type}`, value);
+    return NextResponse.json({ message: "Model set successfully" });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { message: "Invalid payload", issues: error.issues },
+        { status: 400 },
+      );
+    }
+    return NextResponse.json({ message: "Unexpected error" }, { status: 500 });
+  }
 }

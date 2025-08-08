@@ -116,6 +116,40 @@ function AIMessage({ message }: { message: UIMessage }) {
                 </Task>
               </div>
             );
+          case "file":
+            return ( // TODO: test this
+              <div
+                key={`${message.id}-${i}`}
+                className="flex flex-col justify-center"
+              >
+                <Task className="mb-4 w-full">
+                  <TaskTrigger title="Generating image..." />
+                  <TaskContent>
+                    <TaskItem>
+                      <TaskItemFile className="text-red-500">
+                        {part.url ? part.url : "Generating image..."}
+                      </TaskItemFile>
+                    </TaskItem>
+                    <TaskItem>
+                      {part.url ? (
+                        (() => {
+                          const img: GeneratedFile = (part.url as any).image;
+                          return (
+                            <Image
+                              {...img}
+                              alt="Generated image"
+                              className="w-52"
+                            />
+                          );
+                        })()
+                      ) : (
+                        <div></div>
+                      )}
+                    </TaskItem>
+                  </TaskContent>
+                </Task>
+              </div>
+            );
         }
       })}
     </div>

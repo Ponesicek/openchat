@@ -12,11 +12,12 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import Link from "next/link";
 
 const chats = [
   {
     title: "Home",
-    url: "#",
+    url: "/",
     icon: Home,
   },
   {
@@ -36,7 +37,7 @@ const chats = [
   },
   {
     title: "Settings",
-    url: "#",
+    url: "/settings",
     icon: Settings,
   },
 ];
@@ -66,10 +67,10 @@ export function ChatsSidebar() {
               {chats.map((chat) => (
                 <SidebarMenuItem key={chat.title}>
                   <SidebarMenuButton asChild>
-                    <a href={chat.url}>
+                    <Link href={chat.url}>
                       <chat.icon />
                       <span>{chat.title}</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
