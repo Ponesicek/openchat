@@ -178,9 +178,9 @@ export function ProviderSelector({
   );
 }
 
-export function ModelSelector({ models }: { models: string[] }) {
+export function ModelSelector({ models, setModel }: { models: { name: string, slug: string, selected: boolean }[], setModel: (model: string) => void }) {
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState("");
+  console.log("from model selector", models);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -191,7 +191,7 @@ export function ModelSelector({ models }: { models: string[] }) {
           aria-expanded={open}
           className="w-[300px] justify-between"
         >
-          {value ? models.find((model) => model === value) : "Select model..."}
+          {models ? models.find((model) => model.selected)?.name : "Select model..."}
           <ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
@@ -203,20 +203,20 @@ export function ModelSelector({ models }: { models: string[] }) {
             <CommandGroup>
               {models.map((model) => (
                 <CommandItem
-                  key={model}
-                  value={model}
+                  key={model.name}
+                  value={model.name}
                   onSelect={(currentValue) => {
-                    setValue(currentValue === value ? "" : currentValue);
+                    setModel(currentValue);
                     setOpen(false);
                   }}
                 >
                   <CheckIcon
                     className={cn(
                       "mr-2 h-4 w-4",
-                      value === model ? "opacity-100" : "opacity-0",
+                      model.selected ? "opacity-100" : "opacity-0",
                     )}
                   />
-                  {model}
+                  {model.name}
                 </CommandItem>
               ))}
             </CommandGroup>

@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ChatsSidebar } from "@/components/chats-sidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
+import { ReactQueryProvider } from "@/components/providers/react-query";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,10 +31,12 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <main>
+          <ReactQueryProvider>
           <SidebarProvider>
             <ChatsSidebar />
-            <div className="w-full">{children}</div>
-          </SidebarProvider>
+              <div className="w-full">{children}</div>
+            </SidebarProvider>
+          </ReactQueryProvider>
         </main>
       </body>
     </html>

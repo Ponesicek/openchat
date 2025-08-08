@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { object, z } from "zod";
+import {config} from "@/db/json";
 
 const lmstudioModelsResponseSchema = z.object({
   data: z.array(
@@ -17,16 +18,21 @@ export async function GET(request: NextRequest): Promise<
     models: {
       name: string;
       slug: string;
+      selected: boolean;
     }[];
+    provider: string;
   }>
 > {
   const { searchParams } = new URL(request.url);
-  const provider = searchParams.get("provider");
-  const url = searchParams.get("url");
+  let provider = searchParams.get("provider");
+  const activeModel = config.get("connection.LLMModel");
   if (!provider) {
-    return NextResponse.json({ models: [] }, { status: 400 });
+    provider = config.get("connection.LLMProvider") as string;
   }
-  if (provider === "lmstudio") {
+
+  const url = searchParams.get("url");
+switch (provider) {
+  case "lmstudio":
     const response = await fetch(
       url ? url + "/v1/models" : "http://127.0.0.1:1234/v1/models",
     );
@@ -35,9 +41,10 @@ export async function GET(request: NextRequest): Promise<
     const models = parsedData.data.map((model) => ({
       name: model.id,
       slug: model.id,
+      selected: model.id === activeModel,
     }));
-    console.log(models);
-    return NextResponse.json({ models });
-  }
-  return NextResponse.json({ models: [] }, { status: 404 });
+    return NextResponse.json({ models, provider });
+  default:
+    return NextResponse.json({ models: [], provider: provider }, { status: 404 });
+}
 }

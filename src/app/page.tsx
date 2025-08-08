@@ -13,29 +13,42 @@ import {
   PromptInputToolbar,
   PromptInputTools,
 } from "@/components/ai-elements/prompt-input";
-import { GlobeIcon, MicIcon } from "lucide-react";
-import { useState } from "react";
+import { GlobeIcon } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useChat } from "@ai-sdk/react";
 import {
   Conversation,
   ConversationContent,
   ConversationScrollButton,
 } from "@/components/ai-elements/conversation";
-import { MessageContent } from "@/components/ai-elements/message";
-import { Response } from "@/components/ai-elements/response";
 import Message from "@/components/message";
+import { useQuery } from "@tanstack/react-query";
+import { Toaster, toast } from "sonner";
 
-const models = [
-  { id: "llama-3some-8b-v2", name: "Llama 3some 8b v2" },
-  { id: "claude-opus-4-20250514", name: "Claude 4 Opus" },
-];
+const getModels = async () => {
+  const response = await fetch("/api/models/byProvider");
+  const data = await response.json();
+  return data.models;
+}
 
-const InputDemo = () => {
+export default function Page() {
+  const query = useQuery({ queryKey: ['models'], queryFn: getModels })
+  const models: { name: string, slug: string, selected: boolean }[] = query.data ?? [];
   const [text, setText] = useState<string>("");
-  const [model, setModel] = useState<string>(models[0]?.id ?? "");
+  const [model, setModel] = useState<string>("");
+
+  const { messages, status, sendMessage } = useChat();
+
+  useEffect(() => {
+    if (!model && models.length > 0) {
+      const defaultModel = models.find(m => m.selected) ?? models[0] ?? null;
+      if (defaultModel) setModel(defaultModel.name);
+    }
+  }, [models, model]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!model) return;
     sendMessage(
       { text: text },
       {
@@ -47,11 +60,10 @@ const InputDemo = () => {
     setText("");
   };
 
-  const { messages, status, sendMessage } = useChat();
-
   return (
-    <div className="relative top-56 mx-auto size-full h-[900px] max-w-4xl rounded-lg border p-6">
+    <div className="relative mx-auto size-full h-screen max-w-4xl rounded-lg p-6">
       <div className="flex h-full flex-col">
+        <Toaster />
         <Conversation>
           <ConversationContent>
             {messages.map((message) => (
@@ -69,36 +81,40 @@ const InputDemo = () => {
           <PromptInputToolbar>
             <PromptInputTools>
               <PromptInputButton>
-                <MicIcon size={16} />
-              </PromptInputButton>
-              <PromptInputButton>
                 <GlobeIcon size={16} />
                 <span>Search</span>
               </PromptInputButton>
               <PromptInputModelSelect
                 onValueChange={(value) => {
                   setModel(value);
+                  fetch("/api/models/set", {
+                    method: "POST",
+                    body: JSON.stringify({ type: "LLMModel", value: value })
+                  });
+                  toast("Model has been selected.")
                 }}
                 value={model}
               >
-                <PromptInputModelSelectTrigger>
+                <PromptInputModelSelectTrigger
+                  onMouseEnter={() => {
+                    query.refetch();
+                  }}
+                  >
                   <PromptInputModelSelectValue />
                 </PromptInputModelSelectTrigger>
                 <PromptInputModelSelectContent>
                   {models.map((model) => (
-                    <PromptInputModelSelectItem key={model.id} value={model.id}>
+                    <PromptInputModelSelectItem key={model.name} value={model.name}>
                       {model.name}
                     </PromptInputModelSelectItem>
                   ))}
                 </PromptInputModelSelectContent>
               </PromptInputModelSelect>
             </PromptInputTools>
-            <PromptInputSubmit disabled={!text} status={status} />
+            <PromptInputSubmit disabled={!text || !model || query.isLoading} status={status} />
           </PromptInputToolbar>
         </PromptInput>
       </div>
     </div>
   );
-};
-
-export default InputDemo;
+}
