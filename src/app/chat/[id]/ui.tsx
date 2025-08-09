@@ -24,6 +24,7 @@ import {
 import Message from "@/components/message";
 import { useQuery } from "@tanstack/react-query";
 import { Toaster, toast } from "sonner";
+import VRMRenderer from "@/components/VRMrenderer";
 
 const getModels = async () => {
   const response = await fetch("/api/models/byProvider");
@@ -68,8 +69,8 @@ export default function Chat({
   };
 
   return (
-    <div className="relative mx-auto size-full h-screen max-w-4xl rounded-lg p-6">
-      <div className="flex h-full flex-col">
+    <div className="max-w-8xl relative mx-auto flex size-full h-screen flex-row rounded-lg p-6">
+      <div className="mr-4 flex h-full w-full flex-col">
         <Toaster />
         <Conversation>
           <ConversationContent>
@@ -129,6 +130,13 @@ export default function Chat({
             />
           </PromptInputToolbar>
         </PromptInput>
+      </div>
+      <div className="flex h-full min-h-0 w-full flex-col">
+        <VRMRenderer
+          className="h-full w-full"
+          modelUrl="/api/vrm/AvatarSample_B.vrm"
+          animationUrl="/api/vrm/VRMA_03.vrma"
+        />
       </div>
     </div>
   );
