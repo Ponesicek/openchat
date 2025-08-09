@@ -208,7 +208,9 @@ export default function VRMRenderer({
         renderer.dispose();
         container.removeChild(renderer.domElement);
       } catch {
-        // ignore cleanup errors
+      } catch (error) {
+        // ignore cleanup errors, but log for debugging
+        console.error("Cleanup error in VRMRenderer:", error);
       }
     };
   }, [modelUrl, animationUrl]);
