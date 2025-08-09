@@ -3,8 +3,13 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
-import { VRMLoaderPlugin, VRM } from "@pixiv/three-vrm";
-import { VRMAnimation } from "@pixiv/three-vrm-animation";
+import { VRMLoaderPlugin, VRM, VRMUtils } from "@pixiv/three-vrm";
+import {
+  VRMAnimation,
+  VRMAnimationLoaderPlugin,
+  VRMLookAtQuaternionProxy,
+  createVRMAnimationClip,
+} from "@pixiv/three-vrm-animation";
 
 export interface VRMRendererProps {
   modelUrl?: string;
@@ -51,8 +56,10 @@ export default function VRMRenderer({
 
     const loader = new GLTFLoader(); // VRM loader
     loader.register((parser) => new VRMLoaderPlugin(parser)); // register VRM loader plugin
+    loader.register((parser) => new VRMAnimationLoaderPlugin(parser)); // register VRMA loader plugin
 
-    let currentVRM: VRM | null = null;
+    let currentVRM: VRM | undefined = undefined;
+    let currentVRMAnimation: VRMAnimation | undefined = undefined;
     let disposeMixer: (() => void) | null = null;
 
     loader.load(
@@ -60,44 +67,60 @@ export default function VRMRenderer({
       (gltf) => {
         // called when the resource is loaded
         const vrm: VRM = gltf.userData.vrm;
+        if (vrm == null) {
+          return;
+        }
+                // calling these functions greatly improves the performance
+                VRMUtils.removeUnnecessaryVertices(gltf.scene);
+                VRMUtils.combineSkeletons(gltf.scene);
 
-        if (vrm) {
-          currentVRM = vrm;
-          scene.add(vrm.scene);
-        } else if (gltf.scene) {
-          // if no VRM, add the scene
-          scene.add(gltf.scene);
+                if (currentVRM) {
+                  scene.remove(currentVRM.scene);
+                  VRMUtils.deepDispose(currentVRM.scene);
+                }
+
+
+                // Add look at quaternion proxy to the VRM; which is needed to play the look at animation
+                const lookAtQuatProxy = new VRMLookAtQuaternionProxy(vrm.lookAt!);
+                lookAtQuatProxy.name = "lookAtQuaternionProxy";
+                vrm.scene.add(lookAtQuatProxy);
+        
+
+
+        // Disable frustum culling
+        vrm.scene.traverse((obj) => {
+          obj.frustumCulled = false;
+        });
+
+        currentVRM = vrm;
+        scene.add(vrm.scene);
+
+        // rotate if the VRM is VRM0.0
+        VRMUtils.rotateVRM0(vrm);
+
+        if (currentVRM && currentVRMAnimation) {
+          if (mixerRef.current) {
+            try {
+              mixerRef.current.stopAllAction();
+            } catch {}
+          }
+
+          mixerRef.current = new THREE.AnimationMixer(currentVRM.scene);
+
+          const clip = createVRMAnimationClip(currentVRMAnimation, currentVRM);
+          mixerRef.current.clipAction(clip).play();
+          mixerRef.current.timeScale = 1;
+
+          currentVRM.humanoid.resetNormalizedPose();
+          // currentVrm.expressions.resetAll(); // will implement later
+          currentVRM.lookAt?.reset();
+          if (currentVRM.lookAt) {
+            currentVRM.lookAt.autoUpdate =
+              currentVRMAnimation.lookAtTrack != null;
+          }
         }
 
-        // If an animation is provided, load and play it once the model is ready
-        if (animationUrl) {
-          const animLoader = new GLTFLoader();
-          // VRMA is GLB-based; no special plugin needed for parsing basic clips
-          animLoader.load(
-            animationUrl,
-            (animGltf) => {
-              const clips = animGltf.animations ?? [];
-              if (clips.length === 0) return;
-
-              const targetObject = currentVRM?.scene ?? scene;
-              const mixer = new THREE.AnimationMixer(targetObject);
-              mixerRef.current = mixer;
-              const actions = clips.map((clip) => mixer.clipAction(clip));
-              actions.forEach((action) => {
-                action.reset();
-                action.play();
-              });
-              disposeMixer = () => {
-                actions.forEach((action) => action.stop());
-                mixer.stopAllAction();
-              };
-            },
-            undefined,
-            (error) => {
-              console.error("Failed to load VRMA:", error);
-            },
-          );
-        }
+        console.log(vrm);
       },
       undefined,
       (error) => {
@@ -105,47 +128,73 @@ export default function VRMRenderer({
       },
     );
 
-    const clock = new THREE.Clock();
-    const renderLoop = () => {
-      // If using VRM with animations, some implementations expose update(delta)
-      try {
-        const delta = clock.getDelta();
-        if (currentVRM && typeof currentVRM.update === "function") {
-          currentVRM.update(delta);
+    // If an animation is provided, load and play it once the model is ready
+    loader.load(
+      animationUrl,
+      (animGltf) => {
+        const VRMAnimations = animGltf.userData.vrmAnimations ?? [];
+        if (VRMAnimations == null) {
+          return;
         }
-        if (mixerRef.current) {
-          mixerRef.current.update(delta);
-        }
-      } catch {
-        // no-op
-      }
-      renderer.render(scene, camera);
-      animationFrameRef.current = requestAnimationFrame(renderLoop);
-    };
-    animationFrameRef.current = requestAnimationFrame(renderLoop);
 
-    const handleResize = () => {
-      if (!container) return;
-      const width = container.clientWidth;
-      const height = container.clientHeight;
-      camera.aspect = width / height || 1;
-      camera.updateProjectionMatrix();
-      renderer.setSize(width, height);
-      renderer.setPixelRatio(window.devicePixelRatio);
+        currentVRMAnimation = VRMAnimations[0] ?? null;
+        if (currentVRM && currentVRMAnimation) {
+          if (mixerRef.current) {
+            try {
+              mixerRef.current.stopAllAction();
+            } catch {}
+          }
+
+          mixerRef.current = new THREE.AnimationMixer(currentVRM.scene);
+
+          const clip = createVRMAnimationClip(currentVRMAnimation, currentVRM);
+          mixerRef.current.clipAction(clip).play();
+          mixerRef.current.timeScale = 1;
+
+          currentVRM.humanoid.resetNormalizedPose();
+          // currentVrm.expressions.resetAll(); // will implement later
+          currentVRM.lookAt?.reset();
+          if (currentVRM.lookAt) {
+            currentVRM.lookAt.autoUpdate =
+              currentVRMAnimation.lookAtTrack != null;
+          }
+        }
+        console.log(VRMAnimations);
+      },
+      undefined,
+      (error) => {
+        console.error("Failed to load VRMA:", error);
+      },
+    );
+
+    const clock = new THREE.Clock();
+    clock.start();
+    const renderLoop = () => {
+      requestAnimationFrame(renderLoop);
+      const deltaTime = clock.getDelta();
+
+      if (mixerRef.current) {
+        mixerRef.current.update(deltaTime);
+      }
+
+      if (currentVRM) {
+        currentVRM.update(deltaTime);
+      }
+
+      renderer.render(scene, camera);
     };
-    window.addEventListener("resize", handleResize);
+    renderLoop();
 
     return () => {
-      if (animationFrameRef.current)
-        cancelAnimationFrame(animationFrameRef.current);
-      window.removeEventListener("resize", handleResize);
       try {
-        if (disposeMixer) disposeMixer();
+        if (mixerRef.current) {
+          try {
+            mixerRef.current.stopAllAction();
+          } catch {}
+        }
         mixerRef.current = null;
         renderer.dispose();
-        if (renderer.domElement.parentElement === container) {
-          container.removeChild(renderer.domElement);
-        }
+        container.removeChild(renderer.domElement);
       } catch {
         // ignore cleanup errors
       }
