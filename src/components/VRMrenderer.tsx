@@ -99,7 +99,9 @@ export default function VRMRenderer({
           if (mixerRef.current) {
             try {
               mixerRef.current.stopAllAction();
-            } catch {}
+            } catch (error) {
+              console.error("Error stopping all actions in AnimationMixer:", error);
+            }
           }
 
           mixerRef.current = new THREE.AnimationMixer(currentVRM.scene);
