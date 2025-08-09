@@ -200,7 +200,9 @@ export default function VRMRenderer({
         if (mixerRef.current) {
           try {
             mixerRef.current.stopAllAction();
-          } catch {}
+          } catch (error) {
+            console.error("Error stopping all mixer actions during cleanup:", error);
+          }
         }
         mixerRef.current = null;
         renderer.dispose();
