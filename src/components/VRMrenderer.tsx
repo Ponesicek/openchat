@@ -153,7 +153,7 @@ export default function VRMRenderer({
           mixerRef.current.timeScale = 1;
 
           currentVRM.humanoid.resetNormalizedPose();
-          // currentVrm.expressions.resetAll(); // will implement later
+          // currentVRM.expressions.resetAll(); // will implement later
           currentVRM.lookAt?.reset();
           if (currentVRM.lookAt) {
             currentVRM.lookAt.autoUpdate =
