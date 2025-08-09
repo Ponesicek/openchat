@@ -42,7 +42,7 @@ export default function Chat({
     query.data ?? [];
   const [text, setText] = useState<string>("");
   const [model, setModel] = useState<string>("");
-  const [mode, setMode] = useState<string>("text");
+  const [mode, setMode] = useState<string>("3d");
   const { messages, status, sendMessage } = useChat({
     id,
     messages: initialMessages,

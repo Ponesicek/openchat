@@ -167,7 +167,8 @@ export default function VRMRenderer({
     const clock = new THREE.Clock();
     clock.start();
     const renderLoop = () => {
-      requestAnimationFrame(renderLoop);
+      // Store frame id so we can cancel on cleanup when props change
+      animationFrameRef.current = requestAnimationFrame(renderLoop);
       const deltaTime = clock.getDelta();
 
       if (mixerRef.current) {
@@ -187,6 +188,11 @@ export default function VRMRenderer({
 
     return () => {
       try {
+        // cancel any pending animation frame to avoid multiple loops
+        if (animationFrameRef.current != null) {
+          cancelAnimationFrame(animationFrameRef.current);
+          animationFrameRef.current = null;
+        }
         if (mixerRef.current) {
           try {
             mixerRef.current.stopAllAction();
