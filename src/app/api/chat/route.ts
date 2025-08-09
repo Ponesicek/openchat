@@ -12,7 +12,7 @@ import {
 import { tools } from "./tools";
 import { saveChat } from "@/util/chat-store";
 import { createOpenAI, type OpenAIProvider } from "@ai-sdk/openai";
-
+import fs from "fs";
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
 
@@ -47,6 +47,20 @@ export async function POST(req: Request) {
   const configData = await config.json();
 
   const providerObject = getProviderObject(configData.connection.LLMProvider);
+
+    const form = new FormData();
+    form.append("file", fs.readFileSync('audio.mp3', 'base64'));
+    fetch("http://localhost:8000/transcribe", {
+      method: "POST",
+      body: form,
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
+      })
+      .catch((err) => {
+        console.error("Transcribe request failed", err);
+      });
 
   const system = await fetch(
     process.env.NEXT_PUBLIC_URL + "/api/config/parse",

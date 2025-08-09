@@ -51,3 +51,5 @@ data/images/1*
 data/chats/*.json
 data/VRMmodels/*.vrm
 data/VRMmodels/*.vrma
+audio.mp3
+server/audio.*

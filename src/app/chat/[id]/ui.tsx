@@ -47,6 +47,7 @@ export default function Chat({
     id,
     messages: initialMessages,
   });
+  const [expression, setExpression] = useState<{exp:string, value:number}>({exp: "aa", value: 0.5});
 
   useEffect(() => {
     if (!model && models.length > 0) {
@@ -63,6 +64,36 @@ export default function Chat({
     );
     setText("");
   };
+
+  useEffect(() => {
+    const lastMessage = messages[messages.length - 1];
+    for (const part of lastMessage?.parts ?? []) {
+      if (part.type === "text") {
+        // Find 'a', 'e', 'i', 'o', 'u'
+        const e = part.text.match(/e/gi);
+        if (e) {
+          setExpression({exp: "ee", value: 1});
+        }
+        const i = part.text.match(/i/gi);
+        if (i) {
+          setExpression({exp: "ih", value: 1});
+        }
+        const o = part.text.match(/o/gi);
+        if (o) {
+          setExpression({exp: "oh", value: 1});
+        }
+        const u = part.text.match(/u/gi);
+        if (u) {
+          setExpression({exp: "ou", value: 1});
+          console.log(part.text);
+        }
+        const a = part.text.match(/a/gi);
+        if (a) {
+          setExpression({exp: "aa", value: 1});
+        }
+      }
+    }
+  }, [messages]);
 
   return (
     <div className="flex h-screen flex-col">
@@ -150,11 +181,12 @@ export default function Chat({
           </PromptInput>
         </div>
         {(mode === "3d" || mode === "3d-combined") && (
-        <div className="flex h-full min-h-0 w-full flex-col">
+        <div className="flex h-full min-h-0 w-full flex-col" >
           <VRMRenderer
             className="h-full w-full"
             modelUrl="/api/vrm/AvatarSample_B.vrm"
             animationUrl="/api/vrm/VRMA_01.vrma"
+            expression={expression}
           />
         </div>
       )}

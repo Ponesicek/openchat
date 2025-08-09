@@ -16,17 +16,20 @@ export interface VRMRendererProps {
   animationUrl?: string;
   className?: string;
   style?: React.CSSProperties;
+  expression?: {exp:string, value:number};
 }
 
 export default function VRMRenderer({
   modelUrl = "/api/vrm/AvatarSample_B.vrm",
   animationUrl = "/api/vrm/VRMA_01.vrma",
   className,
+  expression,
   style,
 }: VRMRendererProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const animationFrameRef = useRef<number | null>(null);
   const mixerRef = useRef<THREE.AnimationMixer | null>(null);
+  const vrmRef = useRef<VRM | null>(null);
 
   useEffect(() => {
     // #region THREE.js initialization
@@ -90,6 +93,7 @@ export default function VRMRenderer({
         });
 
         currentVRM = vrm;
+        vrmRef.current = vrm;
         scene.add(vrm.scene);
 
         // rotate if the VRM is VRM0.0
@@ -205,6 +209,7 @@ export default function VRMRenderer({
           }
         }
         mixerRef.current = null;
+        vrmRef.current = null;
         renderer.dispose();
         container.removeChild(renderer.domElement);
       } catch (error) {
@@ -213,6 +218,18 @@ export default function VRMRenderer({
       }
     };
   }, [modelUrl, animationUrl]);
+
+  // Apply expression changes from props
+  useEffect(() => {
+    if (!expression) return;
+    const vrm = vrmRef.current;
+    if (!vrm || !vrm.expressionManager) return;
+    try {
+      vrm.expressionManager.setValue(expression.exp, expression.value);
+    } catch (err) {
+      console.error("Failed to set VRM expression:", expression, err);
+    }
+  }, [expression]);
 
   return (
     <div ref={containerRef} className={`${className} relative h-full w-full`} />
