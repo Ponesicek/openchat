@@ -38,18 +38,9 @@ function getProviderObject(provider: string) {
   return providerObject;
 }
 
-
-export async function POST(req: Request) {
-  const { messages, id }: { messages: UIMessage[]; id: string } =
-    await req.json();
-
-  const config = await fetch(process.env.NEXT_PUBLIC_URL + "/api/config/get");
-  const configData = await config.json();
-
-  const providerObject = getProviderObject(configData.connection.LLMProvider);
-
-    const form = new FormData();
+/*    const form = new FormData();
     form.append("file", fs.readFileSync('audio.mp3', 'base64'));
+    form.append("model_name", "faster-whisper-large-v3");
     fetch("http://localhost:8000/transcribe", {
       method: "POST",
       body: form,
@@ -61,6 +52,17 @@ export async function POST(req: Request) {
       .catch((err) => {
         console.error("Transcribe request failed", err);
       });
+*/
+
+
+export async function POST(req: Request) {
+  const { messages, id }: { messages: UIMessage[]; id: string } =
+    await req.json();
+
+  const config = await fetch(process.env.NEXT_PUBLIC_URL + "/api/config/get");
+  const configData = await config.json();
+
+  const providerObject = getProviderObject(configData.connection.LLMProvider);
 
   const system = await fetch(
     process.env.NEXT_PUBLIC_URL + "/api/config/parse",

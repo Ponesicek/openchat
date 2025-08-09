@@ -64,7 +64,7 @@ export default function Chat({
     );
     setText("");
   };
-
+/*
   useEffect(() => {
     const lastMessage = messages[messages.length - 1];
     for (const part of lastMessage?.parts ?? []) {
@@ -94,7 +94,7 @@ export default function Chat({
       }
     }
   }, [messages]);
-
+*/
   return (
     <div className="flex h-screen flex-col">
       <div className="flex h-fit w-full items-center sticky top-0 z-2 p-1 bg-background justify-center border-b">
