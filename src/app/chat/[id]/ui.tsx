@@ -71,7 +71,7 @@ export default function Chat({
 
   return (
     <div className="flex h-screen flex-col">
-      <div className="flex h-fit w-full items-center justify-center">
+      <div className="flex h-fit w-full items-center sticky top-0 z-2 p-1 bg-background justify-center border-b">
         <ToggleGroup
           type="single"
           className="w-full"
@@ -92,7 +92,7 @@ export default function Chat({
           </ToggleGroupItem>
         </ToggleGroup>
       </div>
-      <div className={`relative mx-auto flex size-full h-screen flex-row rounded-lg p-6 ${mode === "text" ? "max-w-4xl" : "w-full"}`}>
+      <div className={`relative mx-auto flex h-[calc(100vh-3rem)] w-full flex-row rounded-lg p-6 pt-0 ${mode === "text" ? "max-w-4xl" : "w-full"}`}>
         <div className="mr-4 flex h-full w-full flex-col">
           <Toaster />
           <Conversation>

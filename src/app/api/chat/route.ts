@@ -10,21 +10,14 @@ import {
 } from "@ai-sdk/openai-compatible";
 import { tools } from "./tools";
 import { saveChat } from "@/util/chat-store";
-import { openai } from "@ai-sdk/openai";
 import { createOpenAI, type OpenAIProvider } from "@ai-sdk/openai";
 
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
 
-export async function POST(req: Request) {
-  const { messages, id }: { messages: UIMessage[]; id: string } =
-    await req.json();
-
-  const config = await fetch(process.env.NEXT_PUBLIC_URL + "/api/config/get");
-  const configData = await config.json();
-
+function getProviderObject(provider: string) {
   let providerObject: OpenAICompatibleProvider | OpenAIProvider;
-  switch (configData.connection.LLMProvider) {
+  switch (provider) {
     case "lmstudio":
       providerObject = createOpenAICompatible({
         name: "lmstudio",
@@ -39,8 +32,20 @@ export async function POST(req: Request) {
       });
       break;
     default:
-      return new Response("Provider not found", { status: 500 });
+      throw new Error("Provider not found");
   }
+  return providerObject;
+}
+
+
+export async function POST(req: Request) {
+  const { messages, id }: { messages: UIMessage[]; id: string } =
+    await req.json();
+
+  const config = await fetch(process.env.NEXT_PUBLIC_URL + "/api/config/get");
+  const configData = await config.json();
+
+  const providerObject = getProviderObject(configData.connection.LLMProvider);
 
   const system = await fetch(
     process.env.NEXT_PUBLIC_URL + "/api/config/parse",
@@ -71,3 +76,4 @@ export async function POST(req: Request) {
     },
   });
 }
+

@@ -207,7 +207,6 @@ export default function VRMRenderer({
         mixerRef.current = null;
         renderer.dispose();
         container.removeChild(renderer.domElement);
-      } catch {
       } catch (error) {
         // ignore cleanup errors, but log for debugging
         console.error("Cleanup error in VRMRenderer:", error);
