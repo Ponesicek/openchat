@@ -3,6 +3,7 @@ import {
   type UIMessage,
   convertToModelMessages,
   stepCountIs,
+  createIdGenerator,
 } from "ai";
 import {
   createOpenAICompatible,
@@ -71,6 +72,11 @@ export async function POST(req: Request) {
 
   return result.toUIMessageStreamResponse({
     originalMessages: messages,
+    // Generate consistent server-side IDs for persistence:
+    generateMessageId: createIdGenerator({
+      prefix: 'msg',
+      size: 16,
+    }),
     onFinish: ({ messages }) => {
       saveChat({ chatId: id, messages });
     },

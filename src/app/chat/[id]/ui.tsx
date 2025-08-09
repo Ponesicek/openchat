@@ -30,7 +30,7 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 const getModels = async () => {
   const response = await fetch("/api/models/byProvider");
   const data = await response.json();
-  return data.models;
+  return data;
 };
 
 export default function Chat({
@@ -39,7 +39,7 @@ export default function Chat({
 }: { id?: string | undefined; initialMessages?: UIMessage[] } = {}) {
   const query = useQuery({ queryKey: ["models"], queryFn: getModels });
   const models: { name: string; slug: string; selected: boolean }[] =
-    query.data ?? [];
+    query.data?.models ?? [];
   const [text, setText] = useState<string>("");
   const [model, setModel] = useState<string>("");
   const [mode, setMode] = useState<string>("3d");
@@ -59,12 +59,7 @@ export default function Chat({
     e.preventDefault();
     if (!model) return;
     sendMessage(
-      { text: text },
-      {
-        body: {
-          model: model,
-        },
-      },
+      { text: text }
     );
     setText("");
   };
