@@ -92,7 +92,7 @@ export default function Chat({
           </ToggleGroupItem>
         </ToggleGroup>
       </div>
-      <div className={` relative mx-auto flex size-full h-screen flex-row rounded-lg p-6 ${mode === "text" ? "max-w-4xl" : "w-full"}`}>
+      <div className={`relative mx-auto flex size-full h-screen flex-row rounded-lg p-6 ${mode === "text" ? "max-w-4xl" : "w-full"}`}>
         <div className="mr-4 flex h-full w-full flex-col">
           <Toaster />
           <Conversation>
