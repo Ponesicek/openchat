@@ -25,6 +25,7 @@ import Message from "@/components/message";
 import { useQuery } from "@tanstack/react-query";
 import { Toaster, toast } from "sonner";
 import VRMRenderer from "@/components/VRMrenderer";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 const getModels = async () => {
   const response = await fetch("/api/models/byProvider");
@@ -41,7 +42,7 @@ export default function Chat({
     query.data ?? [];
   const [text, setText] = useState<string>("");
   const [model, setModel] = useState<string>("");
-
+  const [mode, setMode] = useState<string>("text");
   const { messages, status, sendMessage } = useChat({
     id,
     messages: initialMessages,
@@ -69,74 +70,99 @@ export default function Chat({
   };
 
   return (
-    <div className="max-w-8xl relative mx-auto flex size-full h-screen flex-row rounded-lg p-6">
-      <div className="mr-4 flex h-full w-full flex-col">
-        <Toaster />
-        <Conversation>
-          <ConversationContent>
-            {messages.map((message) => (
-              <Message message={message} key={message.id} />
-            ))}
-          </ConversationContent>
-          <ConversationScrollButton />
-        </Conversation>
-
-        <PromptInput onSubmit={handleSubmit} className="mt-4">
-          <PromptInputTextarea
-            onChange={(e) => setText(e.target.value)}
-            value={text}
-          />
-          <PromptInputToolbar>
-            <PromptInputTools>
-              <PromptInputButton>
-                <GlobeIcon size={16} />
-                <span>Search</span>
-              </PromptInputButton>
-              <PromptInputModelSelect
-                onValueChange={(value) => {
-                  if (!value || value === model) return;
-                  setModel(value);
-                  fetch("/api/models/set", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ type: "LLMModel", value }),
-                  }).catch(() => {});
-                  toast("Model has been selected.");
-                }}
-                value={model}
-              >
-                <PromptInputModelSelectTrigger
-                  onClick={() => {
-                    query.refetch();
-                  }}
-                >
-                  <PromptInputModelSelectValue />
-                </PromptInputModelSelectTrigger>
-                <PromptInputModelSelectContent>
-                  {models.map((model) => (
-                    <PromptInputModelSelectItem
-                      key={model.name}
-                      value={model.name}
-                    >
-                      {model.name}
-                    </PromptInputModelSelectItem>
-                  ))}
-                </PromptInputModelSelectContent>
-              </PromptInputModelSelect>
-            </PromptInputTools>
-            <PromptInputSubmit
-              disabled={!text || !model || query.isLoading}
-              status={status}
-            />
-          </PromptInputToolbar>
-        </PromptInput>
+    <div className="flex h-screen flex-col">
+      <div className="flex h-fit w-full items-center justify-center">
+        <ToggleGroup
+          type="single"
+          className="w-full"
+          value={mode}
+          onValueChange={(value) => {
+            if (!value) return;
+            setMode(value);
+          }}
+        >
+          <ToggleGroupItem value="text">Text</ToggleGroupItem>
+          <ToggleGroupItem value="3d">3D waifu</ToggleGroupItem>
+          <ToggleGroupItem value="2d">2D waifu</ToggleGroupItem>
+          <ToggleGroupItem value="2d-combined">
+            2D text waifu
+          </ToggleGroupItem>
+          <ToggleGroupItem value="3d-combined">
+            3D text waifu
+          </ToggleGroupItem>
+        </ToggleGroup>
       </div>
-      <div className="flex h-full min-h-0 w-full flex-col">
-        <VRMRenderer
-          className="h-full w-full"
-          modelUrl="/api/vrm/AvatarSample_B.vrm"
-          animationUrl="/api/vrm/VRMA_03.vrma"
-        />
+      <div className={` relative mx-auto flex size-full h-screen flex-row rounded-lg p-6 ${mode === "text" ? "max-w-4xl" : "w-full"}`}>
+        <div className="mr-4 flex h-full w-full flex-col">
+          <Toaster />
+          <Conversation>
+            <ConversationContent>
+              {messages.map((message) => (
+                <Message message={message} key={message.id} />
+              ))}
+            </ConversationContent>
+            <ConversationScrollButton />
+          </Conversation>
+
+          <PromptInput onSubmit={handleSubmit} className="mt-4">
+            <PromptInputTextarea
+              onChange={(e) => setText(e.target.value)}
+              value={text}
+            />
+            <PromptInputToolbar>
+              <PromptInputTools>
+                <PromptInputButton>
+                  <GlobeIcon size={16} />
+                  <span>Search</span>
+                </PromptInputButton>
+                <PromptInputModelSelect
+                  onValueChange={(value) => {
+                    if (!value || value === model) return;
+                    setModel(value);
+                    fetch("/api/models/set", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ type: "LLMModel", value }),
+                    }).catch(() => {});
+                    toast("Model has been selected.");
+                  }}
+                  value={model}
+                >
+                  <PromptInputModelSelectTrigger
+                    onClick={() => {
+                      query.refetch();
+                    }}
+                  >
+                    <PromptInputModelSelectValue />
+                  </PromptInputModelSelectTrigger>
+                  <PromptInputModelSelectContent>
+                    {models.map((model) => (
+                      <PromptInputModelSelectItem
+                        key={model.name}
+                        value={model.name}
+                      >
+                        {model.name}
+                      </PromptInputModelSelectItem>
+                    ))}
+                  </PromptInputModelSelectContent>
+                </PromptInputModelSelect>
+              </PromptInputTools>
+              <PromptInputSubmit
+                disabled={!text || !model || query.isLoading}
+                status={status}
+              />
+            </PromptInputToolbar>
+          </PromptInput>
+        </div>
+        {(mode === "3d" || mode === "3d-combined") && (
+        <div className="flex h-full min-h-0 w-full flex-col">
+          <VRMRenderer
+            className="h-full w-full"
+            modelUrl="/api/vrm/AvatarSample_B.vrm"
+            animationUrl="/api/vrm/VRMA_01.vrma"
+          />
+        </div>
+      )}
       </div>
     </div>
   );

@@ -70,22 +70,19 @@ export default function VRMRenderer({
         if (vrm == null) {
           return;
         }
-                // calling these functions greatly improves the performance
-                VRMUtils.removeUnnecessaryVertices(gltf.scene);
-                VRMUtils.combineSkeletons(gltf.scene);
+        // calling these functions greatly improves the performance
+        VRMUtils.removeUnnecessaryVertices(gltf.scene);
+        VRMUtils.combineSkeletons(gltf.scene);
 
-                if (currentVRM) {
-                  scene.remove(currentVRM.scene);
-                  VRMUtils.deepDispose(currentVRM.scene);
-                }
+        if (currentVRM) {
+          scene.remove(currentVRM.scene);
+          VRMUtils.deepDispose(currentVRM.scene);
+        }
 
-
-                // Add look at quaternion proxy to the VRM; which is needed to play the look at animation
-                const lookAtQuatProxy = new VRMLookAtQuaternionProxy(vrm.lookAt!);
-                lookAtQuatProxy.name = "lookAtQuaternionProxy";
-                vrm.scene.add(lookAtQuatProxy);
-        
-
+        // Add look at quaternion proxy to the VRM; which is needed to play the look at animation
+        const lookAtQuatProxy = new VRMLookAtQuaternionProxy(vrm.lookAt!);
+        lookAtQuatProxy.name = "lookAtQuaternionProxy";
+        vrm.scene.add(lookAtQuatProxy);
 
         // Disable frustum culling
         vrm.scene.traverse((obj) => {
@@ -179,6 +176,9 @@ export default function VRMRenderer({
 
       if (currentVRM) {
         currentVRM.update(deltaTime);
+        if (currentVRM.lookAt) {
+          currentVRM.lookAt.lookAt(camera.position);
+        }
       }
 
       renderer.render(scene, camera);
