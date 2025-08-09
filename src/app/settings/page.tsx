@@ -10,7 +10,7 @@ import {
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
-} from "@/components/ui/hover-card"
+} from "@/components/ui/hover-card";
 
 const getModels = async () => {
   const response = await fetch("/api/models/byProvider");
@@ -91,26 +91,26 @@ export default function Settings() {
         </div>
       </div>
       <div className="flex flex-col gap-4">
-      <HoverCard>
-            <HoverCardTrigger className="w-fit">
-              <h2 className="mt-4 text-lg font-bold">System prompt</h2>
-            </HoverCardTrigger>
-            <HoverCardContent>
-              <p>Available variables:</p>
-              <ul>
-                <li>{`{char} - Character name`}</li>
-                <li>{`{user} - Your persona\'s name`}</li>
-              </ul>
-            </HoverCardContent>
-          </HoverCard>
+        <HoverCard>
+          <HoverCardTrigger className="w-fit">
+            <h2 className="mt-4 text-lg font-bold">System prompt</h2>
+          </HoverCardTrigger>
+          <HoverCardContent>
+            <p>Available variables:</p>
+            <ul>
+              <li>{`{char} - Character name`}</li>
+              <li>{`{user} - Your persona\'s name`}</li>
+            </ul>
+          </HoverCardContent>
+        </HoverCard>
         <div className="flex flex-col gap-2">
-          <div className="flex flex-col gap-2 w-full">
+          <div className="flex w-full flex-col gap-2">
             <Textarea
               value={systemPrompt ?? ""}
               onChange={(e) => {
                 setSystemPrompt(e.target.value);
               }}
-              className="w-full min-h-48"
+              className="min-h-48 w-full"
             />
           </div>
           <div className="flex flex-col gap-2">

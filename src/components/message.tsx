@@ -117,7 +117,8 @@ function AIMessage({ message }: { message: UIMessage }) {
               </div>
             );
           case "file":
-            return ( // TODO: test this
+            return (
+              // TODO: test this
               <div
                 key={`${message.id}-${i}`}
                 className="flex flex-col justify-center"

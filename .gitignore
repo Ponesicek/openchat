@@ -48,4 +48,6 @@ yarn-error.log*
 data/config.json
 data/local.db
 data/images/1*
-data/chats/*
+data/chats/*.json
+data/VRMmodels/*.vrm
+data/VRMmodels/*.vrma
