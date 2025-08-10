@@ -31,15 +31,17 @@ export async function loadChat(id: string): Promise<UIMessage[]> {
   return JSON.parse(await readFile(getChatFile(id), "utf8"));
 }
 
-export async function checkNewestChat(){
+export async function checkNewestChat() {
   const chatDir = path.join(process.cwd(), "data/chats");
   const files = await readdir(chatDir);
-  const newestFile = files.filter((file: string) => file.endsWith(".json")).sort((a: string, b: string) => {
-    const aTime = parseInt(a.replace(".json", ""));
-    const bTime = parseInt(b.replace(".json", ""));
-    return bTime - aTime;
-  })[0];
-  
+  const newestFile = files
+    .filter((file: string) => file.endsWith(".json"))
+    .sort((a: string, b: string) => {
+      const aTime = parseInt(a.replace(".json", ""));
+      const bTime = parseInt(b.replace(".json", ""));
+      return bTime - aTime;
+    })[0];
+
   if (newestFile) {
     const chat = await readFile(path.join(chatDir, newestFile), "utf8");
     if (chat === "[]") {

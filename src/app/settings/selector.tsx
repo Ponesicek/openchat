@@ -19,7 +19,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-const providers = [
+export const LLMProviders = [
   {
     value: "openai",
     label: "OpenAI",
@@ -122,10 +122,62 @@ const providers = [
   },
 ];
 
+export const STTProviders = [
+  {
+    value: "openai",
+    label: "OpenAI",
+  },
+  {
+    value: "elevenlabs",
+    label: "ElevenLabs",
+  },
+  {
+    value: "elevenlabs-compatible",
+    label: "ElevenLabs compatible (Custom endpoint)",
+  },
+  {
+    value: "groq",
+    label: "Groq",
+  },
+  {
+    value: "fireworks",
+    label: "Fireworks",
+  },
+  {
+    value: "universal-tts",
+    label: "Universal TTS",
+  },
+  {
+    value: "voxtral",
+    label: "Voxtral",
+  },
+];
+
+export const TTSProviders = [
+  {
+    value: "elevenlabs",
+    label: "ElevenLabs",
+  },
+  {
+    value: "google-cloud-tts",
+    label: "Google Cloud TTS",
+  },
+  {
+    value: "groq",
+    label: "Groq",
+  },
+  {
+    value: "local-tts",
+    label: "Local TTS",
+  },
+];
+
 export function ProviderSelector({
+  providers,
   provider,
   setProvider,
 }: {
+  providers: { value: string; label: string }[];
   provider: string;
   setProvider: (provider: string) => void;
 }) {
@@ -232,5 +284,82 @@ export function ModelSelector({
         </Command>
       </PopoverContent>
     </Popover>
+  );
+}
+
+export function RealtimeTypeSelector({
+  type,
+  setType,
+}: {
+  type: string;
+  setType: (type: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          role="combobox"
+          aria-expanded={open}
+          className="w-[300px] justify-between"
+        >
+          {type}
+          <ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-[300px] p-0">
+        <Command>
+          <CommandInput placeholder="Search model..." />
+          <CommandList>
+            <CommandEmpty>No model found.</CommandEmpty>
+            <CommandGroup>
+              {["Disabled", "TTS/SST", "True Realtime"].map((t) => (
+                <CommandItem
+                  key={t}
+                  value={t}
+                  onSelect={(currentValue) => {
+                    setType(currentValue);
+                    setOpen(false);
+                  }}
+                >
+                  <CheckIcon
+                    className={cn(
+                      "mr-2 h-4 w-4",
+                      t === type ? "opacity-100" : "opacity-0",
+                    )}
+                  />
+                  {t}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+export function SelectSkeleton() {
+  return (
+    <Popover>
+    <PopoverTrigger asChild>
+      <Button
+        variant="outline"
+        role="combobox"
+        className="w-[300px] justify-between"
+      >
+        Loading...
+        <ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+      </Button>
+    </PopoverTrigger>
+    <PopoverContent className="w-[300px] p-0">
+      <Command>
+        <CommandList>
+          <CommandEmpty>Loading...</CommandEmpty>
+        </CommandList>
+      </Command>
+    </PopoverContent>
+  </Popover>
   );
 }

@@ -54,7 +54,6 @@ function getProviderObject(provider: string) {
       });
 */
 
-
 export async function POST(req: Request) {
   const { messages, id }: { messages: UIMessage[]; id: string } =
     await req.json();
@@ -90,7 +89,7 @@ export async function POST(req: Request) {
     originalMessages: messages,
     // Generate consistent server-side IDs for persistence:
     generateMessageId: createIdGenerator({
-      prefix: 'msg',
+      prefix: "msg",
       size: 16,
     }),
     onFinish: ({ messages }) => {
@@ -98,4 +97,3 @@ export async function POST(req: Request) {
     },
   });
 }
-

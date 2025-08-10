@@ -28,7 +28,7 @@ import VRMRenderer from "@/components/VRMrenderer";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 const getModels = async () => {
-  const response = await fetch("/api/models/byProvider");
+  const response = await fetch("/api/models/LLM/byProvider");
   const data = await response.json();
   return data;
 };
@@ -47,7 +47,10 @@ export default function Chat({
     id,
     messages: initialMessages,
   });
-  const [expression, setExpression] = useState<{exp:string, value:number}>({exp: "aa", value: 0.5});
+  const [expression, setExpression] = useState<{ exp: string; value: number }>({
+    exp: "aa",
+    value: 0.5,
+  });
 
   useEffect(() => {
     if (!model && models.length > 0) {
@@ -59,12 +62,10 @@ export default function Chat({
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!model) return;
-    sendMessage(
-      { text: text }
-    );
+    sendMessage({ text: text });
     setText("");
   };
-/*
+  /*
   useEffect(() => {
     const lastMessage = messages[messages.length - 1];
     for (const part of lastMessage?.parts ?? []) {
@@ -97,7 +98,7 @@ export default function Chat({
 */
   return (
     <div className="flex h-screen flex-col">
-      <div className="flex h-fit w-full items-center sticky top-0 z-2 p-1 bg-background justify-center border-b">
+      <div className="bg-background sticky top-0 z-2 flex h-fit w-full items-center justify-center border-b p-1">
         <ToggleGroup
           type="single"
           className="w-full"
@@ -110,15 +111,13 @@ export default function Chat({
           <ToggleGroupItem value="text">Text</ToggleGroupItem>
           <ToggleGroupItem value="3d">3D waifu</ToggleGroupItem>
           <ToggleGroupItem value="2d">2D waifu</ToggleGroupItem>
-          <ToggleGroupItem value="2d-combined">
-            2D text waifu
-          </ToggleGroupItem>
-          <ToggleGroupItem value="3d-combined">
-            3D text waifu
-          </ToggleGroupItem>
+          <ToggleGroupItem value="2d-combined">2D text waifu</ToggleGroupItem>
+          <ToggleGroupItem value="3d-combined">3D text waifu</ToggleGroupItem>
         </ToggleGroup>
       </div>
-      <div className={`relative mx-auto flex h-[calc(100vh-3rem)] w-full flex-row rounded-lg p-6 pt-0 ${mode === "text" ? "max-w-4xl" : "w-full"}`}>
+      <div
+        className={`relative mx-auto flex h-[calc(100vh-3rem)] w-full flex-row rounded-lg p-6 pt-0 ${mode === "text" ? "max-w-4xl" : "w-full"}`}
+      >
         <div className="mr-4 flex h-full w-full flex-col">
           <Toaster />
           <Conversation>
@@ -145,7 +144,7 @@ export default function Chat({
                   onValueChange={(value) => {
                     if (!value || value === model) return;
                     setModel(value);
-                    fetch("/api/models/set", {
+                    fetch("/api/models/LLM/set", {
                       method: "POST",
                       headers: { "Content-Type": "application/json" },
                       body: JSON.stringify({ type: "LLMModel", value }),
@@ -181,15 +180,15 @@ export default function Chat({
           </PromptInput>
         </div>
         {(mode === "3d" || mode === "3d-combined") && (
-        <div className="flex h-full min-h-0 w-full flex-col" >
-          <VRMRenderer
-            className="h-full w-full"
-            modelUrl="/api/vrm/AvatarSample_B.vrm"
-            animationUrl="/api/vrm/VRMA_01.vrma"
-            expression={expression}
-          />
-        </div>
-      )}
+          <div className="flex h-full min-h-0 w-full flex-col">
+            <VRMRenderer
+              className="h-full w-full"
+              modelUrl="/api/vrm/AvatarSample_B.vrm"
+              animationUrl="/api/vrm/VRMA_01.vrma"
+              expression={expression}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

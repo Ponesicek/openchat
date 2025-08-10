@@ -53,3 +53,5 @@ data/VRMmodels/*.vrm
 data/VRMmodels/*.vrma
 audio.mp3
 server/audio.*
+server310/*
+serveruv/*

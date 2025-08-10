@@ -16,7 +16,7 @@ export interface VRMRendererProps {
   animationUrl?: string;
   className?: string;
   style?: React.CSSProperties;
-  expression?: {exp:string, value:number};
+  expression?: { exp: string; value: number };
 }
 
 export default function VRMRenderer({
@@ -104,7 +104,10 @@ export default function VRMRenderer({
             try {
               mixerRef.current.stopAllAction();
             } catch (error) {
-              console.error("Error stopping all actions in AnimationMixer:", error);
+              console.error(
+                "Error stopping all actions in AnimationMixer:",
+                error,
+              );
             }
           }
 
@@ -146,7 +149,10 @@ export default function VRMRenderer({
             try {
               mixerRef.current.stopAllAction();
             } catch (error) {
-              console.error("Error stopping all actions in mixerRef.current:", error);
+              console.error(
+                "Error stopping all actions in mixerRef.current:",
+                error,
+              );
             }
           }
 
@@ -205,7 +211,10 @@ export default function VRMRenderer({
           try {
             mixerRef.current.stopAllAction();
           } catch (error) {
-            console.error("Error stopping all mixer actions during cleanup:", error);
+            console.error(
+              "Error stopping all mixer actions during cleanup:",
+              error,
+            );
           }
         }
         mixerRef.current = null;
