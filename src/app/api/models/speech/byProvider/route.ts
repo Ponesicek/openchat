@@ -13,7 +13,7 @@ const groqModelsResponseSchema = z.object({
   object: z.string(),
 });
 
-const kindSchema = z.enum(["TTS", "STT"]);
+const kindSchema = z.enum(["TTS", "STT", "Realtime"]);
 
 export async function GET(request: NextRequest): Promise<
   NextResponse<{
@@ -32,13 +32,53 @@ export async function GET(request: NextRequest): Promise<
   }
 
   const isTTS = kind.data === "TTS";
-  const providerKey = isTTS ? "Realtime.TTSProvider" : "Realtime.STTProvider";
-  const modelKey = isTTS ? "Realtime.TTSModel" : "Realtime.STTModel";
+  const isRealtime = kind.data === "Realtime";
+  const providerKey = isTTS
+    ? "Realtime.TTSProvider"
+    : isRealtime
+      ? "Realtime.realtimeProvider"
+      : "Realtime.STTProvider";
+  const modelKey = isTTS
+    ? "Realtime.TTSModel"
+    : isRealtime
+      ? "Realtime.realtimeModel"
+      : "Realtime.STTModel";
   const providerOverride = searchParams.get("provider") ?? undefined;
   const url = searchParams.get("url") ?? undefined;
 
-  const provider = providerOverride ?? (config.get(providerKey) as string);
+  const provider = providerOverride ?? (config.get(providerKey) as string | undefined);
   const activeModel = config.get(modelKey) as string;
+  const providerString = provider ?? "";
+
+  if (isRealtime) {
+    switch (provider) {
+    case "openai": {
+      return NextResponse.json({
+        models: [
+          {
+            name: "gpt-4o-realtime-preview-2025-06-03",
+            slug: "gpt-4o-realtime-preview-2025-06-03",
+            selected:
+              activeModel === "gpt-4o-realtime-preview-2025-06-03",
+          },
+          {
+            name: "gpt-4o-mini-realtime-preview-2024-12-17",
+            slug: "gpt-4o-mini-realtime-preview-2024-12-17",
+            selected:
+              activeModel === "gpt-4o-mini-realtime-preview-2024-12-17",
+          },
+        ],
+        provider: providerString,
+      });
+    }
+    default: {
+      return NextResponse.json(
+        { models: [], provider: providerString },
+        { status: 404 },
+      );
+    }
+  }
+}
 
   switch (provider) {
     case "groq": {
@@ -54,28 +94,29 @@ export async function GET(request: NextRequest): Promise<
       });
       if (!groqResponse.ok) {
         return NextResponse.json(
-          { models: [], provider },
+          { models: [], provider: providerString },
           { status: 502 },
         );
       }
       const groqData = await groqResponse.json();
-      const parsed = groqModelsResponseSchema.safeParse(groqData);
-      if (!parsed.success) {
+      try {
+        const parsed = groqModelsResponseSchema.parse(groqData);
+        const models = parsed.data.map((m) => ({
+          name: m.id,
+          slug: m.id,
+          selected: m.id === activeModel,
+        }));
+        return NextResponse.json({ models, provider: providerString });
+      } catch {
         return NextResponse.json(
-          { models: [], provider },
+          { models: [], provider: providerString },
           { status: 502 },
         );
       }
-      const models = parsed.data.data.map((m) => ({
-        name: m.id,
-        slug: m.id,
-        selected: m.id === activeModel,
-      }));
-      return NextResponse.json({ models, provider });
     }
     default: {
       return NextResponse.json(
-        { models: [], provider: provider ?? "" },
+        { models: [], provider: providerString },
         { status: 404 },
       );
     }

@@ -59,6 +59,3 @@ def transcribe(model_name: str = Form(...), file: str = Form(...)):
         active_model = model_name
         return transcribe(model_name, file)
 
-@app.post("/speech")
-def transcribe_faster_whisper_large_v3(file: str = Form(...)):
-    return transcribe("faster-whisper-large-v3", file)

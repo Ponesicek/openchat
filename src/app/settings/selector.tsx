@@ -172,6 +172,21 @@ export const TTSProviders = [
   },
 ];
 
+export const RealtimeProviders = [
+  {
+    value: "google",
+    label: "Google",
+  },
+  {
+    value: "openai",
+    label: "OpenAI",
+  },
+  {
+    value: "elevenlabs",
+    label: "ElevenLabs",
+  },
+];
+
 export function ProviderSelector({
   providers,
   provider,

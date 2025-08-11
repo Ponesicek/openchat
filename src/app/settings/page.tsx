@@ -1,24 +1,17 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
-  RealtimeTypeSelector,
-  ProviderSelector,
-  ModelSelector,
   TTSProviders,
   STTProviders,
   LLMProviders,
+  RealtimeProviders,
 } from "./selector";
 import { useQuery } from "@tanstack/react-query";
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@/components/ui/hover-card";
-import { SelectSkeleton } from "./selector";
 import { z } from "zod";
+import { ConnectionSection } from "./components/ConnectionSection";
+import { RealtimeSection } from "./components/RealtimeSection";
+import { SystemPromptSection } from "./components/SystemPromptSection";
 
 const getModels = async () => {
   const response = await fetch("/api/models/LLM/byProvider");
@@ -34,6 +27,12 @@ const getTTSModels = async () => {
 
 const getSTTModels = async () => {
   const response = await fetch("/api/models/speech/byProvider?kind=STT");
+  const data = await response.json();
+  return data;
+};
+
+const getRealtimeModels = async () => {
+  const response = await fetch("/api/models/speech/byProvider?kind=Realtime");
   const data = await response.json();
   return data;
 };
@@ -82,10 +81,13 @@ export default function Settings() {
   const query = useQuery({ queryKey: ["models"], queryFn: getModels }); // Get the models
   const ttsQuery = useQuery({ queryKey: ["ttsModels"], queryFn: getTTSModels }); // Get the TTS models
   const sttQuery = useQuery({ queryKey: ["sttModels"], queryFn: getSTTModels }); // Get the STT models
+  const realtimeQuery = useQuery({ queryKey: ["realtimeModels"], queryFn: getRealtimeModels }); // Get the Realtime models
   const TTSModels: { name: string; slug: string; selected: boolean }[] = // Get the models from react query
     ttsQuery.data?.models ?? [];
   const STTModels: { name: string; slug: string; selected: boolean }[] = // Get the models from react query
     sttQuery.data?.models ?? [];
+  const RealtimeModels: { name: string; slug: string; selected: boolean }[] = // Get the models from react query
+    realtimeQuery.data?.models ?? [];
   const models: { name: string; slug: string; selected: boolean }[] = // Get the models from react query
     query.data?.models ?? [];
   const [provider, setProvider] = useState(query.data?.provider ?? null); // Get the active provider from react query
@@ -144,194 +146,131 @@ export default function Settings() {
     <div className="stretch mx-auto flex w-full max-w-4xl flex-col py-6">
       <h1 className="text-2xl font-bold">Settings</h1>
       <div className="flex flex-col gap-4">
-        <h2 className="mt-4 text-lg font-bold">Connection</h2>
-        <div className="flex flex-row gap-2">
-          <div className="flex flex-col gap-2">
-            <h3 className="text-md font-bold">Provider</h3>
-            <ProviderSelector
-              providers={LLMProviders}
-              provider={provider}
-              setProvider={(value) => {
-                setProvider(value);
-                fetch("/api/models/LLM/set", {
-                  method: "POST",
-                  body: JSON.stringify({ type: "LLMProvider", value: value }),
-                });
-                query.refetch();
-              }}
-            />
-          </div>
-          <div className="flex flex-col gap-2">
-            <h3 className="text-md font-bold">Model</h3>
-            <Suspense fallback={<SelectSkeleton />}>
-            <ModelSelector
-              models={models}
-              setModel={(value) => {
-                setModel(
-                  models.find((m) => m.name === value) ?? models[0] ?? null,
-                );
-                fetch("/api/models/LLM/set", {
-                  method: "POST",
-                  body: JSON.stringify({ type: "LLMModel", value: value }),
-                });
-                query.refetch();
-              }}
-            />
-            </Suspense>
-          </div>
-        </div>
-        <div className="flex flex-col gap-2">
-          <h3 className="text-md font-bold">Realtime</h3>
-          {speechConfig && (
-            <RealtimeTypeSelector
-              type={speechConfig.type}
-              setType={(value) => {
-                setSpeechConfig({ ...speechConfig, type: value });
-                fetch("/api/models/speech/set", {
-                  method: "POST",
-                  body: JSON.stringify({ type: "type", value }),
-                });
-              }}
-            />
-          )}
-        </div>
-        {speechConfig?.type !== "Disabled" && (
-          <>
-          {speechConfig?.type === "TTS/SST" && (
-          <div className="flex flex-col gap-2">
-            <div className="flex flex-row gap-2">
-              <div className="flex flex-col gap-2">
-                <h3 className="text-md font-bold">TTS Provider</h3>
-                <ProviderSelector
-                  providers={TTSProviders}
-                  provider={speechConfig?.TTS?.provider ?? ""}
-                  setProvider={(value) => {
-                    if (!speechConfig) return;
-                    setSpeechConfig({
-                      ...speechConfig,
-                      TTS: { ...speechConfig.TTS, provider: value },
-                    });
-                    fetch("/api/models/speech/set", {
-                      method: "POST",
-                      body: JSON.stringify({
-                        type: "TTSProvider",
-                        value: value,
-                      }),
-                    });
-                    ttsQuery.refetch();
-                  }}
-                />
-              </div>
-              <div className="flex flex-col gap-2">
-                <h3 className="text-md font-bold">TTS Model</h3>
-                <Suspense fallback={<SelectSkeleton />}>
-                <ModelSelector
-                  models={TTSModels}
-                  setModel={(value) => {
-                    if (!speechConfig) return;
-                    setSpeechConfig({
-                      ...speechConfig,
-                      TTS: { ...speechConfig.TTS, model: value },
-                    });
-                    fetch("/api/models/speech/set", {
-                      method: "POST",
-                      body: JSON.stringify({ type: "TTSModel", value: value }),
-                    });
-                    ttsQuery.refetch();
-                  }}
-                />
-                </Suspense>
-              </div>
-            </div>
-            <div className="flex flex-row gap-2">
-              <div className="flex flex-col gap-2">
-                <h3 className="text-md font-bold">STT Provider</h3>
-                <ProviderSelector
-                  providers={STTProviders}
-                  provider={speechConfig?.STT?.provider ?? ""}
-                  setProvider={(value) => {
-                    if (!speechConfig) return;
-                    setSpeechConfig({
-                      ...speechConfig,
-                      STT: { ...speechConfig.STT, provider: value },
-                    });
-                    fetch("/api/models/speech/set", {
-                      method: "POST",
-                      body: JSON.stringify({
-                        type: "STTProvider",
-                        value: value,
-                      }),
-                    });
-                    sttQuery.refetch();
-                  }}
-                />
-              </div>
-              <div className="flex flex-col gap-2">
-                <h3 className="text-md font-bold">STT Model</h3>
-                <Suspense fallback={<SelectSkeleton />}>
-                <ModelSelector
-                  models={STTModels}
-                  setModel={(value) => {
-                    if (!speechConfig) return;
-                    setSpeechConfig({
-                      ...speechConfig,
-                      STT: { ...speechConfig.STT, model: value },
-                    });
-                    fetch("/api/models/speech/set", {
-                      method: "POST",
-                      body: JSON.stringify({ type: "STTModel", value: value }),
-                    });
-                    sttQuery.refetch();
-                  }}
-                />
-                </Suspense>
-              </div>
-            </div>
-          </div>
-          )}
+        <ConnectionSection
+          provider={provider}
+          providers={LLMProviders}
+          models={models}
+          onProviderChange={(value) => {
+            setProvider(value);
+            fetch("/api/models/LLM/set", {
+              method: "POST",
+              body: JSON.stringify({ type: "LLMProvider", value }),
+            });
+            query.refetch();
+          }}
+          onModelChange={(value) => {
+            setModel(models.find((m) => m.name === value) ?? models[0] ?? null);
+            fetch("/api/models/LLM/set", {
+              method: "POST",
+              body: JSON.stringify({ type: "LLMModel", value }),
+            });
+            query.refetch();
+          }}
+        />
 
-          </>
-        )}
-      </div>
-      <div className="flex flex-col gap-4">
-        <HoverCard>
-          <HoverCardTrigger className="w-fit">
-            <h2 className="mt-4 text-lg font-bold">System prompt</h2>
-          </HoverCardTrigger>
-          <HoverCardContent>
-            <p>Available variables:</p>
-            <ul>
-              <li>{`{char} - Character name`}</li>
-              <li>{`{user} - Your persona\'s name`}</li>
-            </ul>
-          </HoverCardContent>
-        </HoverCard>
-        <div className="flex flex-col gap-2">
-          <div className="flex w-full flex-col gap-2">
-            <Textarea
-              value={systemPrompt ?? ""}
-              onChange={(e) => {
-                setSystemPrompt(e.target.value);
-              }}
-              className="min-h-48 w-full"
-            />
-          </div>
-          <div className="flex flex-col gap-2">
-            <Button
-              onClick={() => {
-                fetch("/api/config/set", {
-                  method: "POST",
-                  body: JSON.stringify({
-                    key: "AI.defaultPrompt",
-                    value: systemPrompt,
-                  }),
-                });
-              }}
-            >
-              Save
-            </Button>
-          </div>
-        </div>
+        <RealtimeSection
+          speechConfig={speechConfig}
+          ttsProviders={TTSProviders}
+          sttProviders={STTProviders}
+          realtimeProviders={RealtimeProviders}
+          ttsModels={TTSModels}
+          sttModels={STTModels}
+          realtimeModels={RealtimeModels}
+          onTypeChange={(value) => {
+            if (!speechConfig) return;
+            setSpeechConfig({ ...speechConfig, type: value });
+            fetch("/api/models/speech/set", {
+              method: "POST",
+              body: JSON.stringify({ type: "type", value }),
+            });
+          }}
+          onTTSProviderChange={(value) => {
+            if (!speechConfig) return;
+            setSpeechConfig({
+              ...speechConfig,
+              TTS: { ...speechConfig.TTS, provider: value },
+            });
+            fetch("/api/models/speech/set", {
+              method: "POST",
+              body: JSON.stringify({ type: "TTSProvider", value }),
+            });
+            ttsQuery.refetch();
+          }}
+          onTTSModelChange={(value) => {
+            if (!speechConfig) return;
+            setSpeechConfig({
+              ...speechConfig,
+              TTS: { ...speechConfig.TTS, model: value },
+            });
+            fetch("/api/models/speech/set", {
+              method: "POST",
+              body: JSON.stringify({ type: "TTSModel", value }),
+            });
+            ttsQuery.refetch();
+          }}
+          onSTTProviderChange={(value) => {
+            if (!speechConfig) return;
+            setSpeechConfig({
+              ...speechConfig,
+              STT: { ...speechConfig.STT, provider: value },
+            });
+            fetch("/api/models/speech/set", {
+              method: "POST",
+              body: JSON.stringify({ type: "STTProvider", value }),
+            });
+            sttQuery.refetch();
+          }}
+          onSTTModelChange={(value) => {
+            if (!speechConfig) return;
+            setSpeechConfig({
+              ...speechConfig,
+              STT: { ...speechConfig.STT, model: value },
+            });
+            fetch("/api/models/speech/set", {
+              method: "POST",
+              body: JSON.stringify({ type: "STTModel", value }),
+            });
+            sttQuery.refetch();
+          }}
+          onRealtimeProviderChange={(value) => {
+            if (!speechConfig) return;
+            setSpeechConfig({
+              ...speechConfig,
+              Realtime: { ...speechConfig.Realtime, realtimeProvider: value },
+            });
+            fetch("/api/models/speech/set", {
+              method: "POST",
+              body: JSON.stringify({ type: "realtimeProvider", value }),
+            });
+            realtimeQuery.refetch();
+          }}
+          onRealtimeModelChange={(value) => {
+            if (!speechConfig) return;
+            setSpeechConfig({
+              ...speechConfig,
+              Realtime: { ...speechConfig.Realtime, realtimeModel: value },
+            });
+            fetch("/api/models/speech/set", {
+              method: "POST",
+              body: JSON.stringify({ type: "realtimeModel", value }),
+            });
+            realtimeQuery.refetch();
+          }}
+        />
+
+        <SystemPromptSection
+          prompt={systemPrompt ?? ""}
+          onChange={(next) => setSystemPrompt(next)}
+          onSave={() => {
+            fetch("/api/config/set", {
+              method: "POST",
+              body: JSON.stringify({
+                key: "AI.defaultPrompt",
+                value: systemPrompt,
+              }),
+            });
+          }}
+        />
       </div>
     </div>
   );
