@@ -13,6 +13,17 @@ const lmstudioModelsResponseSchema = z.object({
   object: z.string(),
 });
 
+const openaiModelsResponseSchema = z.object({
+  data: z.array(
+    z.object({
+      id: z.string(),
+      object: z.string().nullish(),
+      owned_by: z.string().nullish(),
+    }),
+  ),
+  object: z.string().nullish(),
+});
+
 export async function GET(request: NextRequest): Promise<
   NextResponse<{
     models: {
@@ -54,8 +65,10 @@ export async function GET(request: NextRequest): Promise<
           },
         },
       );
+      console.log(openaiResponse);
       const openaiData = await openaiResponse.json();
-      const openaiParsedData = lmstudioModelsResponseSchema.parse(openaiData);
+      console.log(openaiData);
+      const openaiParsedData = openaiModelsResponseSchema.parse(openaiData);
       const openaiModels = openaiParsedData.data.map((model) => ({
         name: model.id,
         slug: model.id,

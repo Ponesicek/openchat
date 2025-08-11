@@ -65,7 +65,7 @@ def transcribe(model_name: str = Form(...), file: str = Form(...)):
 @app.post("/speech")
 def speech(text: str = Form(...)):
     voice="E:\\AI\\openchat\\server\\voice.ogg"
-    prompt_text="Aloy here. I don't know this world, but my arrows are sharp and my bow's ready. If your party needs help, I'll do what I can."
+    prompt_text="The work of the astrologer is to show people what fate has in store for them, and that's exactly what I do."
     url = (
         "http://127.0.0.1:9880/tts"
         "?text={}"
