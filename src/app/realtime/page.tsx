@@ -22,7 +22,7 @@ export default function RealtimePage() {
       model: 'gpt-4o-mini-realtime-preview',
     }) as unknown as SessionWithEvents;
 
-    session.connect({ apiKey: 'ek_68988d0a502081918f746139bbd766bf' });
+    session.connect({ apiKey: '' });
 
     session.on('message', (message: unknown) => {
       console.log(message);
