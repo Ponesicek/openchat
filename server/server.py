@@ -6,6 +6,9 @@ import whisper
 from fastapi import FastAPI, Form
 from fastapi.middleware.cors import CORSMiddleware
 from faster_whisper import WhisperModel
+import requests
+import sounddevice as sd
+import numpy as np
 
 app = FastAPI()
 
@@ -59,3 +62,37 @@ def transcribe(model_name: str = Form(...), file: str = Form(...)):
         active_model = model_name
         return transcribe(model_name, file)
 
+@app.post("/speech")
+def speech(text: str = Form(...)):
+    voice="E:\\AI\\openchat\\server\\voice.ogg"
+    prompt_text="Aloy here. I don't know this world, but my arrows are sharp and my bow's ready. If your party needs help, I'll do what I can."
+    url = (
+        "http://127.0.0.1:9880/tts"
+        "?text={}"
+        "&text_lang=en"
+        "&ref_audio_path={}"
+        "&prompt_lang=en"
+        "&prompt_text={}"
+        "&text_split_method=cut5"
+        "&batch_size=1"
+        "&media_type=wav"
+        "&streaming_mode=true"
+    ).format(text, voice, prompt_text)
+
+    samplerate = 32000 
+    channels = 1  # or 2 depending on your TTS output
+    with requests.get(url, stream=True) as r:
+        header_skipped = False
+        with sd.OutputStream(samplerate=samplerate, channels=channels, dtype="int16") as stream:
+            for chunk in r.iter_content(chunk_size=4096):
+                if not chunk:
+                    continue
+                if not header_skipped:
+                    # Skip WAV header (44 bytes for PCM)
+                    if len(chunk) <= 44:
+                        continue
+                    chunk = chunk[44:]
+                    header_skipped = True
+                audio_array = np.frombuffer(chunk, dtype=np.int16)
+                if len(audio_array) > 0:
+                    stream.write(audio_array)

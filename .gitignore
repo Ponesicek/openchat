@@ -57,3 +57,4 @@ server/*.wav
 server/*.ogg
 server/.venv/*
 server/__pycache__/*
+server/OVRLipSync.dll
