@@ -1,0 +1,132 @@
+[
+  {
+    "phoneme": "\u0250l\u0254\u026a",
+    "start": 0,
+    "end": 0.326
+  },
+  {
+    "phoneme": "h\u026a\u0279",
+    "start": 0.326,
+    "end": 0.651
+  },
+  {
+    "phoneme": "a\u026a",
+    "start": 0.651,
+    "end": 0.977
+  },
+  {
+    "phoneme": "do\u028ant",
+    "start": 0.977,
+    "end": 1.302
+  },
+  {
+    "phoneme": "no\u028a",
+    "start": 1.302,
+    "end": 1.628
+  },
+  {
+    "phoneme": "\u00f0\u026as",
+    "start": 1.628,
+    "end": 1.953
+  },
+  {
+    "phoneme": "w\u025c\u02d0ld",
+    "start": 1.953,
+    "end": 2.279
+  },
+  {
+    "phoneme": "b\u028ct",
+    "start": 2.279,
+    "end": 2.604
+  },
+  {
+    "phoneme": "ma\u026a",
+    "start": 2.604,
+    "end": 2.93
+  },
+  {
+    "phoneme": "\u00e6\u0279o\u028az",
+    "start": 2.93,
+    "end": 3.255
+  },
+  {
+    "phoneme": "\u0251\u02d0\u0279",
+    "start": 3.255,
+    "end": 3.581
+  },
+  {
+    "phoneme": "\u0283\u0251\u02d0\u0279p",
+    "start": 3.581,
+    "end": 3.906
+  },
+  {
+    "phoneme": "\u00e6nd",
+    "start": 3.906,
+    "end": 4.232
+  },
+  {
+    "phoneme": "ma\u026a",
+    "start": 4.232,
+    "end": 4.558
+  },
+  {
+    "phoneme": "bo\u028az",
+    "start": 4.558,
+    "end": 4.883
+  },
+  {
+    "phoneme": "\u0279\u025bdi",
+    "start": 4.883,
+    "end": 5.209
+  },
+  {
+    "phoneme": "\u026af",
+    "start": 5.209,
+    "end": 5.534
+  },
+  {
+    "phoneme": "j\u028a\u0279",
+    "start": 5.534,
+    "end": 5.86
+  },
+  {
+    "phoneme": "p\u0251\u02d0\u0279\u027ei",
+    "start": 5.86,
+    "end": 6.185
+  },
+  {
+    "phoneme": "ni\u02d0dz",
+    "start": 6.185,
+    "end": 6.511
+  },
+  {
+    "phoneme": "h\u025blp",
+    "start": 6.511,
+    "end": 6.836
+  },
+  {
+    "phoneme": "a\u026al",
+    "start": 6.836,
+    "end": 7.162
+  },
+  {
+    "phoneme": "du\u02d0",
+    "start": 7.162,
+    "end": 7.487
+  },
+  {
+    "phoneme": "w\u028ct",
+    "start": 7.487,
+    "end": 7.813
+  },
+  {
+    "phoneme": "a\u026a",
+    "start": 7.813,
+    "end": 8.138
+  },
+  {
+    "phoneme": "k\u00e6n",
+    "start": 8.138,
+    "end": 8.464
+  }
+]
