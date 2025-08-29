@@ -120,6 +120,10 @@ export const LLMProviders = [
     value: "openai-compatible",
     label: "OpenAI compatible (Custom endpoint)",
   },
+  {
+    value: "vercel",
+    label: "Vercel",
+  },
 ];
 
 export const STTProviders = [

@@ -75,6 +75,18 @@ export async function GET(request: NextRequest): Promise<
         selected: model.id === activeModel,
       }));
       return NextResponse.json({ models: openaiModels, provider });
+    case "vercel":
+      const gatewayResponse = await fetch(
+        url ? url + "/v1/models" : "https://ai-gateway.vercel.sh/v1/models",
+      );
+      const gatewayData = await gatewayResponse.json();
+      const gatewayParsedData = openaiModelsResponseSchema.parse(gatewayData);
+      const gatewayModels = gatewayParsedData.data.map((model) => ({
+        name: model.id,
+        slug: model.id,
+        selected: model.id === activeModel,
+      }));
+      return NextResponse.json({ models: gatewayModels, provider });
     default:
       return NextResponse.json(
         { models: [], provider: provider },

@@ -12,12 +12,12 @@ import {
 import { tools } from "./tools";
 import { saveChat } from "@/util/chat-store";
 import { createOpenAI, type OpenAIProvider } from "@ai-sdk/openai";
-import fs from "fs";
+import { createGateway, type GatewayProvider } from "@ai-sdk/gateway";
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
 
 function getProviderObject(provider: string) {
-  let providerObject: OpenAICompatibleProvider | OpenAIProvider;
+  let providerObject: OpenAICompatibleProvider | OpenAIProvider | GatewayProvider;
   switch (provider) {
     case "lmstudio":
       providerObject = createOpenAICompatible({
@@ -30,6 +30,11 @@ function getProviderObject(provider: string) {
         name: "openai",
         apiKey: process.env.OPENAI_API_KEY,
         baseURL: "https://api.openai.com/v1",
+      });
+      break;
+    case "vercel":
+      providerObject = createGateway({
+        apiKey: process.env.AI_GATEWAY_API_KEY,
       });
       break;
     default:

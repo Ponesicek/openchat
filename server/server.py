@@ -4,6 +4,7 @@ import tempfile
 
 import whisper
 from fastapi import FastAPI, Form
+from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from faster_whisper import WhisperModel
 import requests
@@ -63,7 +64,7 @@ def transcribe(model_name: str = Form(...), file: str = Form(...)):
         return transcribe(model_name, file)
 
 @app.post("/speech")
-def speech(text: str = Form(...)):
+async def speech(text: str = Form(...)):
     voice="E:\\AI\\openchat\\server\\voice.ogg"
     prompt_text="The work of the astrologer is to show people what fate has in store for them, and that's exactly what I do."
     url = (
@@ -79,20 +80,10 @@ def speech(text: str = Form(...)):
         "&streaming_mode=true"
     ).format(text, voice, prompt_text)
 
-    samplerate = 32000 
-    channels = 1  # or 2 depending on your TTS output
-    with requests.get(url, stream=True) as r:
-        header_skipped = False
-        with sd.OutputStream(samplerate=samplerate, channels=channels, dtype="int16") as stream:
+    async def audio_streamer():
+        with requests.get(url, stream=True) as r:
             for chunk in r.iter_content(chunk_size=4096):
-                if not chunk:
-                    continue
-                if not header_skipped:
-                    # Skip WAV header (44 bytes for PCM)
-                    if len(chunk) <= 44:
-                        continue
-                    chunk = chunk[44:]
-                    header_skipped = True
-                audio_array = np.frombuffer(chunk, dtype=np.int16)
-                if len(audio_array) > 0:
-                    stream.write(audio_array)
+                if chunk:
+                    yield chunk
+
+    return StreamingResponse(audio_streamer(), media_type="audio/wav")
