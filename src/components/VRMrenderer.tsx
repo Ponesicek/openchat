@@ -30,6 +30,33 @@ export default function VRMRenderer({
   const animationFrameRef = useRef<number | null>(null);
   const mixerRef = useRef<THREE.AnimationMixer | null>(null);
   const vrmRef = useRef<VRM | null>(null);
+  const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
+  const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
+  const sceneRef = useRef<THREE.Scene | null>(null);
+
+  // Handle window resize
+  useEffect(() => {
+    const handleResize = () => {
+      const container = containerRef.current;
+      const renderer = rendererRef.current;
+      const camera = cameraRef.current;
+      
+      if (!container || !renderer || !camera) return;
+      
+      const width = container.clientWidth;
+      const height = container.clientHeight;
+      
+      // Update camera aspect ratio
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+      
+      // Update renderer size
+      renderer.setSize(width, height);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     // #region THREE.js initialization
@@ -39,6 +66,7 @@ export default function VRMRenderer({
     const scene = new THREE.Scene(); // scene
     scene.background = new THREE.Color(0xffffff);
     scene.add(new THREE.AmbientLight(0xffffff, 4)); // ambient light
+    sceneRef.current = scene;
 
     const camera = new THREE.PerspectiveCamera( // camera
       50,
@@ -47,6 +75,7 @@ export default function VRMRenderer({
       20,
     );
     camera.position.set(0, 1.4, 1.5); // Left/right, up/down, forward/backward
+    cameraRef.current = camera;
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true }); // renderer
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -55,6 +84,7 @@ export default function VRMRenderer({
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.sortObjects = true;
     container.appendChild(renderer.domElement);
+    rendererRef.current = renderer;
     // #endregion
 
     const loader = new GLTFLoader(); // VRM loader
@@ -87,9 +117,12 @@ export default function VRMRenderer({
         lookAtQuatProxy.name = "lookAtQuaternionProxy";
         vrm.scene.add(lookAtQuatProxy);
 
-        // Disable frustum culling
+        // Disable frustum culling selectively (only for avatar body parts, not accessories)
         vrm.scene.traverse((obj) => {
-          obj.frustumCulled = false;
+          // Only disable frustum culling for mesh objects that are part of the avatar
+          if (obj.type === 'SkinnedMesh' || obj.name.toLowerCase().includes('body')) {
+            obj.frustumCulled = false;
+          }
         });
 
         currentVRM = vrm;
@@ -180,9 +213,20 @@ export default function VRMRenderer({
 
     const clock = new THREE.Clock();
     clock.start();
-    const renderLoop = () => {
+    let lastFrameTime = 0;
+    const targetFPS = 60;
+    const frameInterval = 1000 / targetFPS;
+    
+    const renderLoop = (currentTime: number = 0) => {
       // Store frame id so we can cancel on cleanup when props change
       animationFrameRef.current = requestAnimationFrame(renderLoop);
+      
+      // Throttle to target FPS
+      if (currentTime - lastFrameTime < frameInterval) {
+        return;
+      }
+      lastFrameTime = currentTime;
+      
       const deltaTime = clock.getDelta();
 
       if (mixerRef.current) {
@@ -221,6 +265,11 @@ export default function VRMRenderer({
         vrmRef.current = null;
         renderer.dispose();
         container.removeChild(renderer.domElement);
+        
+        // Clear refs
+        rendererRef.current = null;
+        cameraRef.current = null;
+        sceneRef.current = null;
       } catch (error) {
         // ignore cleanup errors, but log for debugging
         console.error("Cleanup error in VRMRenderer:", error);
