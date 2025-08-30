@@ -25,10 +25,7 @@ export async function GET(request: NextRequest): Promise<
   const kindParam = searchParams.get("kind");
   const kind = kindSchema.safeParse(kindParam ?? "");
   if (!kind.success) {
-    return NextResponse.json(
-      { models: [], provider: "" },
-      { status: 400 },
-    );
+    return NextResponse.json({ models: [], provider: "" }, { status: 400 });
   }
 
   const isTTS = kind.data === "TTS";
@@ -46,39 +43,39 @@ export async function GET(request: NextRequest): Promise<
   const providerOverride = searchParams.get("provider") ?? undefined;
   const url = searchParams.get("url") ?? undefined;
 
-  const provider = providerOverride ?? (config.get(providerKey) as string | undefined);
+  const provider =
+    providerOverride ?? (config.get(providerKey) as string | undefined);
   const activeModel = config.get(modelKey) as string;
   const providerString = provider ?? "";
 
   if (isRealtime) {
     switch (provider) {
-    case "openai": {
-      return NextResponse.json({
-        models: [
-          {
-            name: "gpt-4o-realtime-preview-2025-06-03",
-            slug: "gpt-4o-realtime-preview-2025-06-03",
-            selected:
-              activeModel === "gpt-4o-realtime-preview-2025-06-03",
-          },
-          {
-            name: "gpt-4o-mini-realtime-preview-2024-12-17",
-            slug: "gpt-4o-mini-realtime-preview-2024-12-17",
-            selected:
-              activeModel === "gpt-4o-mini-realtime-preview-2024-12-17",
-          },
-        ],
-        provider: providerString,
-      });
-    }
-    default: {
-      return NextResponse.json(
-        { models: [], provider: providerString },
-        { status: 404 },
-      );
+      case "openai": {
+        return NextResponse.json({
+          models: [
+            {
+              name: "gpt-4o-realtime-preview-2025-06-03",
+              slug: "gpt-4o-realtime-preview-2025-06-03",
+              selected: activeModel === "gpt-4o-realtime-preview-2025-06-03",
+            },
+            {
+              name: "gpt-4o-mini-realtime-preview-2024-12-17",
+              slug: "gpt-4o-mini-realtime-preview-2024-12-17",
+              selected:
+                activeModel === "gpt-4o-mini-realtime-preview-2024-12-17",
+            },
+          ],
+          provider: providerString,
+        });
+      }
+      default: {
+        return NextResponse.json(
+          { models: [], provider: providerString },
+          { status: 404 },
+        );
+      }
     }
   }
-}
 
   switch (provider) {
     case "groq": {
@@ -122,4 +119,3 @@ export async function GET(request: NextRequest): Promise<
     }
   }
 }
-

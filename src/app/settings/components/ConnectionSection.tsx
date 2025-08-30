@@ -33,7 +33,7 @@ export function ConnectionSection({
         </div>
         <div className="flex flex-col gap-2">
           <h3 className="text-md font-bold">Model</h3>
-          <Suspense fallback={<SelectSkeleton />}> 
+          <Suspense fallback={<SelectSkeleton />}>
             <ModelSelector models={models} setModel={onModelChange} />
           </Suspense>
         </div>
@@ -41,5 +41,3 @@ export function ConnectionSection({
     </div>
   );
 }
-
-

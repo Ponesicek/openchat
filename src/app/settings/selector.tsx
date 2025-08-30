@@ -362,23 +362,23 @@ export function RealtimeTypeSelector({
 export function SelectSkeleton() {
   return (
     <Popover>
-    <PopoverTrigger asChild>
-      <Button
-        variant="outline"
-        role="combobox"
-        className="w-[300px] justify-between"
-      >
-        Loading...
-        <ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-      </Button>
-    </PopoverTrigger>
-    <PopoverContent className="w-[300px] p-0">
-      <Command>
-        <CommandList>
-          <CommandEmpty>Loading...</CommandEmpty>
-        </CommandList>
-      </Command>
-    </PopoverContent>
-  </Popover>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          role="combobox"
+          className="w-[300px] justify-between"
+        >
+          Loading...
+          <ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-[300px] p-0">
+        <Command>
+          <CommandList>
+            <CommandEmpty>Loading...</CommandEmpty>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   );
 }

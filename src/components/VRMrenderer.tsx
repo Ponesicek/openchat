@@ -40,22 +40,22 @@ export default function VRMRenderer({
       const container = containerRef.current;
       const renderer = rendererRef.current;
       const camera = cameraRef.current;
-      
+
       if (!container || !renderer || !camera) return;
-      
+
       const width = container.clientWidth;
       const height = container.clientHeight;
-      
+
       // Update camera aspect ratio
       camera.aspect = width / height;
       camera.updateProjectionMatrix();
-      
+
       // Update renderer size
       renderer.setSize(width, height);
     };
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   useEffect(() => {
@@ -120,7 +120,10 @@ export default function VRMRenderer({
         // Disable frustum culling selectively (only for avatar body parts, not accessories)
         vrm.scene.traverse((obj) => {
           // Only disable frustum culling for mesh objects that are part of the avatar
-          if (obj.type === 'SkinnedMesh' || obj.name.toLowerCase().includes('body')) {
+          if (
+            obj.type === "SkinnedMesh" ||
+            obj.name.toLowerCase().includes("body")
+          ) {
             obj.frustumCulled = false;
           }
         });
@@ -216,17 +219,17 @@ export default function VRMRenderer({
     let lastFrameTime = 0;
     const targetFPS = 60;
     const frameInterval = 1000 / targetFPS;
-    
+
     const renderLoop = (currentTime: number = 0) => {
       // Store frame id so we can cancel on cleanup when props change
       animationFrameRef.current = requestAnimationFrame(renderLoop);
-      
+
       // Throttle to target FPS
       if (currentTime - lastFrameTime < frameInterval) {
         return;
       }
       lastFrameTime = currentTime;
-      
+
       const deltaTime = clock.getDelta();
 
       if (mixerRef.current) {
@@ -265,7 +268,7 @@ export default function VRMRenderer({
         vrmRef.current = null;
         renderer.dispose();
         container.removeChild(renderer.domElement);
-        
+
         // Clear refs
         rendererRef.current = null;
         cameraRef.current = null;

@@ -3,7 +3,15 @@ import { z } from "zod";
 import { config } from "@/db/json";
 
 const setSpeechSchema = z.object({
-  type: z.enum(["TTSModel", "TTSProvider", "STTModel", "STTProvider", "type", "realtimeProvider", "realtimeModel"]),
+  type: z.enum([
+    "TTSModel",
+    "TTSProvider",
+    "STTModel",
+    "STTProvider",
+    "type",
+    "realtimeProvider",
+    "realtimeModel",
+  ]),
   value: z.string().min(1),
 });
 

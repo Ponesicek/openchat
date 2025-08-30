@@ -1,8 +1,5 @@
 "use client";
 
-import { ChevronDownIcon } from "lucide-react";
-import type { ComponentProps, ReactNode } from "react";
-import { createContext, useContext, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Collapsible,
@@ -17,6 +14,9 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { ChevronDownIcon } from "lucide-react";
+import type { ComponentProps, ReactNode } from "react";
+import { createContext, useContext, useState } from "react";
 
 export type WebPreviewContextValue = {
   url: string;
@@ -107,11 +107,11 @@ export const WebPreviewNavigationButton = ({
     <Tooltip>
       <TooltipTrigger asChild>
         <Button
-          variant="ghost"
-          size="sm"
           className="hover:text-foreground h-8 w-8 p-0"
-          onClick={onClick}
           disabled={disabled}
+          onClick={onClick}
+          size="sm"
+          variant="ghost"
           {...props}
         >
           {children}
@@ -145,10 +145,10 @@ export const WebPreviewUrl = ({
   return (
     <Input
       className="h-8 flex-1 text-sm"
-      placeholder="Enter URL..."
-      value={value ?? url}
       onChange={onChange}
       onKeyDown={handleKeyDown}
+      placeholder="Enter URL..."
+      value={value ?? url}
       {...props}
     />
   );
@@ -170,9 +170,9 @@ export const WebPreviewBody = ({
     <div className="flex-1">
       <iframe
         className={cn("size-full", className)}
-        src={src ?? url}
-        title="Preview"
         sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-presentation"
+        src={(src ?? url) || undefined}
+        title="Preview"
         {...props}
       />
       {loading}
@@ -198,15 +198,15 @@ export const WebPreviewConsole = ({
 
   return (
     <Collapsible
-      open={consoleOpen}
-      onOpenChange={setConsoleOpen}
       className={cn("bg-muted/50 border-t font-mono text-sm", className)}
+      onOpenChange={setConsoleOpen}
+      open={consoleOpen}
       {...props}
     >
       <CollapsibleTrigger asChild>
         <Button
-          variant="ghost"
           className="hover:bg-muted/50 flex w-full items-center justify-between p-4 text-left font-medium"
+          variant="ghost"
         >
           Console
           <ChevronDownIcon
@@ -220,7 +220,7 @@ export const WebPreviewConsole = ({
       <CollapsibleContent
         className={cn(
           "px-4 pb-4",
-          "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 outline-none",
+          "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=closed]:animate-out data-[state=open]:animate-in outline-none",
         )}
       >
         <div className="max-h-48 space-y-1 overflow-y-auto">
@@ -229,13 +229,13 @@ export const WebPreviewConsole = ({
           ) : (
             logs.map((log, index) => (
               <div
-                key={`${log.timestamp.getTime()}-${index}`}
                 className={cn(
                   "text-xs",
                   log.level === "error" && "text-destructive",
                   log.level === "warn" && "text-yellow-600",
                   log.level === "log" && "text-foreground",
                 )}
+                key={`${log.timestamp.getTime()}-${index}`}
               >
                 <span className="text-muted-foreground">
                   {log.timestamp.toLocaleTimeString()}

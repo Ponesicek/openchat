@@ -71,8 +71,11 @@ export function RealtimeSection({
                 </div>
                 <div className="flex flex-col gap-2">
                   <h3 className="text-md font-bold">TTS Model</h3>
-                  <Suspense fallback={<SelectSkeleton />}> 
-                    <ModelSelector models={ttsModels} setModel={onTTSModelChange} />
+                  <Suspense fallback={<SelectSkeleton />}>
+                    <ModelSelector
+                      models={ttsModels}
+                      setModel={onTTSModelChange}
+                    />
                   </Suspense>
                 </div>
               </div>
@@ -87,8 +90,11 @@ export function RealtimeSection({
                 </div>
                 <div className="flex flex-col gap-2">
                   <h3 className="text-md font-bold">STT Model</h3>
-                  <Suspense fallback={<SelectSkeleton />}> 
-                    <ModelSelector models={sttModels} setModel={onSTTModelChange} />
+                  <Suspense fallback={<SelectSkeleton />}>
+                    <ModelSelector
+                      models={sttModels}
+                      setModel={onSTTModelChange}
+                    />
                   </Suspense>
                 </div>
               </div>
@@ -107,7 +113,7 @@ export function RealtimeSection({
               </div>
               <div className="flex flex-col gap-2">
                 <h3 className="text-md font-bold">Realtime Model</h3>
-                <Suspense fallback={<SelectSkeleton />}> 
+                <Suspense fallback={<SelectSkeleton />}>
                   <ModelSelector
                     models={realtimeModels}
                     setModel={onRealtimeModelChange}
@@ -121,5 +127,3 @@ export function RealtimeSection({
     </div>
   );
 }
-
-

@@ -56,22 +56,4 @@ function Button({
   );
 }
 
-function DivButton({
-  className,
-  variant,
-  size,
-  ...props
-}: React.ComponentProps<"div"> &
-  VariantProps<typeof buttonVariants> & {
-    asChild?: boolean;
-  }) {
-  return (
-    <div
-      data-slot="button"
-      className={cn(buttonVariants({ variant, size, className }))}
-      {...props}
-    />
-  );
-}
-
-export { Button, DivButton, buttonVariants };
+export { Button, buttonVariants };

@@ -17,8 +17,8 @@ import {
   TaskItemFile,
   TaskTrigger,
 } from "@/components/ai-elements/task";
-import { Actions, Action } from '@/components/ai-elements/actions';
-import { MicIcon } from 'lucide-react';
+import { Actions, Action } from "@/components/ai-elements/actions";
+import { MicIcon } from "lucide-react";
 
 function UserMessage({ message }: { message: UIMessage }) {
   return (
@@ -57,19 +57,22 @@ function AIMessage({ message }: { message: UIMessage }) {
             return (
               <div key={`${message.id}-${i}`}>
                 <Response>{part.text}</Response>
-            <Actions className="mt-2">
-            <Action label="Speak" onClick={() => {
-              const data = new FormData();
-              data.append("text", part.text);
-              fetch("http://localhost:8000/speech", {
-                method: "POST",
-                body: data,
-              });
-            }}>
-              <MicIcon className="size-4" />
-            </Action>
-          </Actions>
-          </div>
+                <Actions className="mt-2">
+                  <Action
+                    label="Speak"
+                    onClick={() => {
+                      const data = new FormData();
+                      data.append("text", part.text);
+                      fetch("http://localhost:8000/speech", {
+                        method: "POST",
+                        body: data,
+                      });
+                    }}
+                  >
+                    <MicIcon className="size-4" />
+                  </Action>
+                </Actions>
+              </div>
             );
           case "tool-generateImage":
             return (

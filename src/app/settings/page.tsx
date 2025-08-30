@@ -75,13 +75,15 @@ const speechConfigSchema = z.object({
   }),
 });
 
-
 export default function Settings() {
   const configQuery = useQuery({ queryKey: ["config"], queryFn: getConfig }); // Get the config
   const query = useQuery({ queryKey: ["models"], queryFn: getModels }); // Get the models
   const ttsQuery = useQuery({ queryKey: ["ttsModels"], queryFn: getTTSModels }); // Get the TTS models
   const sttQuery = useQuery({ queryKey: ["sttModels"], queryFn: getSTTModels }); // Get the STT models
-  const realtimeQuery = useQuery({ queryKey: ["realtimeModels"], queryFn: getRealtimeModels }); // Get the Realtime models
+  const realtimeQuery = useQuery({
+    queryKey: ["realtimeModels"],
+    queryFn: getRealtimeModels,
+  }); // Get the Realtime models
   const TTSModels: { name: string; slug: string; selected: boolean }[] = // Get the models from react query
     ttsQuery.data?.models ?? [];
   const STTModels: { name: string; slug: string; selected: boolean }[] = // Get the models from react query
@@ -97,9 +99,9 @@ export default function Settings() {
   const [systemPrompt, setSystemPrompt] = useState(
     configQuery.data?.AI.defaultPrompt ?? null, // Get the system prompt from react query
   );
-  const [speechConfig, setSpeechConfig] = useState<z.infer<typeof speechConfigSchema> | null>(
-    null,
-  );
+  const [speechConfig, setSpeechConfig] = useState<z.infer<
+    typeof speechConfigSchema
+  > | null>(null);
 
   useEffect(() => {
     if (configQuery.data) {

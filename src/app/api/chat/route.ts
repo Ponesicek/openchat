@@ -17,7 +17,10 @@ import { createGateway, type GatewayProvider } from "@ai-sdk/gateway";
 export const maxDuration = 30;
 
 function getProviderObject(provider: string) {
-  let providerObject: OpenAICompatibleProvider | OpenAIProvider | GatewayProvider;
+  let providerObject:
+    | OpenAICompatibleProvider
+    | OpenAIProvider
+    | GatewayProvider;
   switch (provider) {
     case "lmstudio":
       providerObject = createOpenAICompatible({
