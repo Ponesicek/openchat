@@ -13,7 +13,7 @@ import {
   PromptInputToolbar,
   PromptInputTools,
 } from "@/components/ai-elements/prompt-input";
-import { GlobeIcon } from "lucide-react";
+import { Volume2 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useChat, type UIMessage } from "@ai-sdk/react";
 import {
@@ -47,7 +47,7 @@ export default function Chat({
     id,
     messages: initialMessages,
   });
-  const MAX_UI_UPDATES_PER_SECOND = 8;
+  const MAX_UI_UPDATES_PER_SECOND = 5;
   const [displayMessages, setDisplayMessages] = useState<UIMessage[]>(
     initialMessages ?? [],
   );
@@ -65,11 +65,15 @@ export default function Chat({
     }
   }, [models, model]);
 
+  const submitTextMessage = (content: string) => {
+    if (!model) return;
+    sendMessage({ text: content });
+    setText("");
+  };
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!model) return;
-    sendMessage({ text: text });
-    setText("");
+    submitTextMessage(text);
   };
 
   useEffect(() => {
@@ -160,6 +164,7 @@ export default function Chat({
       <div
         className={`relative mx-auto flex h-[calc(100vh-3rem)] w-full flex-row rounded-lg p-6 pt-0 ${mode === "text" ? "max-w-4xl" : "w-full"}`}
       >
+        {(mode === "text" || mode === "2d-combined" || mode === "3d-combined") && (
         <div className="mr-4 flex h-full w-full flex-col">
           <Toaster />
           <Conversation>
@@ -174,9 +179,39 @@ export default function Chat({
             />
             <PromptInputToolbar>
               <PromptInputTools>
-                <PromptInputButton>
-                  <GlobeIcon size={16} />
-                  <span>Search</span>
+                <PromptInputButton onClick={() => {
+                  navigator.mediaDevices
+                  .getUserMedia(
+                    {
+                      audio: true,
+                    },
+                  )
+                  .then(stream => {
+                    const SpeechRecognitionConstructor =
+                      (window as any).SpeechRecognition ||
+                      (window as any).webkitSpeechRecognition;
+                    if (!SpeechRecognitionConstructor) {
+                      toast.error("SpeechRecognition is not supported in this browser.");
+                      return;
+                    }
+                    const recognition = new SpeechRecognitionConstructor();
+                    recognition.lang = "en-US";
+                    recognition.interimResults = true;
+                    let transcript = "";
+                    recognition.start();
+                    recognition.onresult = (event: any) => {
+                      transcript = event.results[0][0].transcript;
+                      setText(transcript);
+                    };
+                    recognition.onend = (event: any) => {
+                      submitTextMessage(transcript);
+                    };
+                    recognition.onerror = (event: any) => {
+                      toast.error("SpeechRecognition error: " + event.error);
+                    };
+                  })
+                  }}>
+                  <Volume2 size={16} />
                 </PromptInputButton>
                 <PromptInputModelSelect
                   onValueChange={(value) => {
@@ -217,6 +252,7 @@ export default function Chat({
             </PromptInputToolbar>
           </PromptInput>
         </div>
+        )}
         {(mode === "3d" || mode === "3d-combined") && (
           <div className="flex h-full min-h-0 w-full flex-col">
             <VRMRenderer
