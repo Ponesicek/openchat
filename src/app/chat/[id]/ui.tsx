@@ -14,7 +14,7 @@ import {
   PromptInputTools,
 } from "@/components/ai-elements/prompt-input";
 import { GlobeIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useChat, type UIMessage } from "@ai-sdk/react";
 import {
   Conversation,
@@ -47,6 +47,12 @@ export default function Chat({
     id,
     messages: initialMessages,
   });
+  const MAX_UI_UPDATES_PER_SECOND = 8;
+  const [displayMessages, setDisplayMessages] = useState<UIMessage[]>(
+    initialMessages ?? [],
+  );
+  const lastUpdateRef = useRef<number>(0);
+  const timerRef = useRef<number | null>(null);
   const [expression, setExpression] = useState<{ exp: string; value: number }>({
     exp: "aa",
     value: 0.5,
@@ -65,6 +71,42 @@ export default function Chat({
     sendMessage({ text: text });
     setText("");
   };
+
+  useEffect(() => {
+    const interval = 1000 / MAX_UI_UPDATES_PER_SECOND;
+    const now = performance.now();
+    const elapsed = now - lastUpdateRef.current;
+    if (elapsed >= interval) {
+      setDisplayMessages(messages);
+      lastUpdateRef.current = now;
+    } else {
+      if (timerRef.current != null) {
+        clearTimeout(timerRef.current);
+      }
+      const delay = Math.max(0, interval - elapsed);
+      timerRef.current = window.setTimeout(() => {
+        setDisplayMessages(messages);
+        lastUpdateRef.current = performance.now();
+        timerRef.current = null;
+      }, delay);
+    }
+  }, [messages]);
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current != null) {
+        clearTimeout(timerRef.current);
+      }
+    };
+  }, []);
+
+  const renderedMessages = useMemo(
+    () =>
+      displayMessages.map((message) => (
+        <Message message={message} key={message.id} />
+      )),
+    [displayMessages],
+  );
   /*
   useEffect(() => {
     const lastMessage = messages[messages.length - 1];
@@ -121,11 +163,7 @@ export default function Chat({
         <div className="mr-4 flex h-full w-full flex-col">
           <Toaster />
           <Conversation>
-            <ConversationContent>
-              {messages.map((message) => (
-                <Message message={message} key={message.id} />
-              ))}
-            </ConversationContent>
+            <ConversationContent>{renderedMessages}</ConversationContent>
             <ConversationScrollButton />
           </Conversation>
 

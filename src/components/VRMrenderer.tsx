@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, memo } from "react";
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { VRMLoaderPlugin, VRM, VRMUtils } from "@pixiv/three-vrm";
@@ -19,7 +19,7 @@ export interface VRMRendererProps {
   expression?: { exp: string; value: number };
 }
 
-export default function VRMRenderer({
+function VRMRenderer({
   modelUrl = "/api/vrm/AvatarSample_B.vrm",
   animationUrl = "/api/vrm/VRMA_01.vrma",
   className,
@@ -33,31 +33,7 @@ export default function VRMRenderer({
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
-
-  // Handle window resize
-  useEffect(() => {
-    const handleResize = () => {
-      const container = containerRef.current;
-      const renderer = rendererRef.current;
-      const camera = cameraRef.current;
-
-      if (!container || !renderer || !camera) return;
-
-      const width = container.clientWidth;
-      const height = container.clientHeight;
-
-      // Update camera aspect ratio
-      camera.aspect = width / height;
-      camera.updateProjectionMatrix();
-
-      // Update renderer size
-      renderer.setSize(width, height);
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
+  
   useEffect(() => {
     // #region THREE.js initialization
     const container = containerRef.current;
@@ -296,3 +272,21 @@ export default function VRMRenderer({
     <div ref={containerRef} className={`${className} relative h-full w-full`} />
   );
 }
+
+function arePropsEqual(
+  prev: Readonly<VRMRendererProps>,
+  next: Readonly<VRMRendererProps>,
+): boolean {
+  if (prev.modelUrl !== next.modelUrl) return false;
+  if (prev.animationUrl !== next.animationUrl) return false;
+  if (prev.className !== next.className) return false;
+  if (prev.style !== next.style) return false;
+
+  const prevExp = prev.expression;
+  const nextExp = next.expression;
+  if (prevExp === nextExp) return true;
+  if (!prevExp || !nextExp) return false;
+  return prevExp.exp === nextExp.exp && prevExp.value === nextExp.value;
+}
+
+export default memo(VRMRenderer, arePropsEqual);
