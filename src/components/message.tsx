@@ -63,7 +63,7 @@ function AIMessage({ message }: { message: UIMessage }) {
                     onClick={async () => {
                       try {
                         //#region REQUEST
-                        const CACHE_SIZE = 8;
+                        const CACHE_SIZE = 4;
                         const data = new FormData();
                         data.append("text", part.text);
                         const response = await fetch("http://localhost:8000/speech", {
