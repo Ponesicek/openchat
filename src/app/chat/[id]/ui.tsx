@@ -64,7 +64,7 @@ export default function Chat({
     (async () => {
       try {
         //#region REQUEST
-        const CACHE_SIZE = 8;
+        const CACHE_SIZE = 4;
         const data = new FormData();
         data.append("text", messages[messages.length - 1]?.parts?.find((part) => part.type === "text")?.text ?? "");
         const response = await fetch("http://localhost:8000/speech", {
