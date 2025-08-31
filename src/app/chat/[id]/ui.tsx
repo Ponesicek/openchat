@@ -26,6 +26,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Toaster, toast } from "sonner";
 import VRMRenderer from "@/components/VRMrenderer";
 import Nav from "@/components/nav";
+import { useSpeech } from "@/hooks/use-speech";
 
 const getModels = async () => {
   const response = await fetch("/api/models/LLM/byProvider");
@@ -57,180 +58,22 @@ export default function Chat({
     exp: "aa",
     value: 0.5,
   });
-  const [speechMode, setSpeechMode] = useState<"disabled" | "listening" | "speaking">("disabled");
 
+  const { speechMode, setSpeechMode, speak, startListening } = useSpeech({
+    onTranscriptUpdate: (transcript) => setText(transcript),
+    onTranscriptComplete: (transcript) => submitTextMessage(transcript),
+  });
+
+  // Trigger TTS when ready to speak
   useEffect(() => {
-    if (status !== "ready" || speechMode === "disabled" || speechMode === "listening") return
-    (async () => {
-      try {
-        //#region REQUEST
-        const CACHE_SIZE = 4;
-        const data = new FormData();
-        data.append("text", messages[messages.length - 1]?.parts?.find((part) => part.type === "text")?.text ?? "");
-        const response = await fetch("http://localhost:8000/speech", {
-          method: "POST",
-          body: data,
-        });
-        if (!response.ok) {
-          throw new Error(`TTS request failed: ${response.status}`);
-        }
-        const reader = response.body?.getReader();
-        if (!reader) {
-          throw new Error("No response body reader available");
-        }
-        //#endregion
-
-        const audio = new Audio();
-        audio.autoplay = true;
-
-        const wavMime = 'audio/wav; codecs="1"';
-        const canUseMSE = typeof MediaSource !== "undefined" &&
-          (MediaSource as any).isTypeSupported &&
-          (MediaSource as any).isTypeSupported(wavMime);
-          console.log("canUseMSE", canUseMSE);
-
-        if (canUseMSE) {
-          // Stream via MediaSource, start after ~CACHE_SIZE chunks
-          const mediaSource = new MediaSource();
-          const objectUrl = URL.createObjectURL(mediaSource);
-          audio.src = objectUrl;
-          audio.onended = () => {
-            try { URL.revokeObjectURL(objectUrl); } catch {}
-            setSpeechMode("listening");
-          };
-          let started = false;
-          const queue: Uint8Array[] = [];
-
-          await new Promise<void>((resolve) => {
-            mediaSource.addEventListener("sourceopen", () => resolve(), { once: true });
-          });
-
-          const sourceBuffer = mediaSource.addSourceBuffer(wavMime);
-
-          const appendNext = () => {
-            if (sourceBuffer.updating) return;
-            const next = queue.shift();
-            if (next) {
-              const slice = next.buffer.slice(next.byteOffset, next.byteOffset + next.byteLength);
-              sourceBuffer.appendBuffer(slice);
-            }
-          };
-
-          sourceBuffer.addEventListener("updateend", appendNext);
-
-          (async () => {
-            try {
-              while (true) {
-                const { value, done } = await reader.read();
-                if (done) break;
-                if (value) {
-                  queue.push(value);
-                  if (!started && queue.length >= CACHE_SIZE) {
-                    started = true;
-                    // Kick off appending and playback
-                    appendNext();
-                    audio.play().catch(() => {});
-                  } else if (started) {
-                    appendNext();
-                  }
-                }
-              }
-              // Flush remaining and close
-              await new Promise<void>((resolve) => {
-                if (!sourceBuffer.updating && queue.length === 0) return resolve();
-                const checkDone = () => {
-                  if (!sourceBuffer.updating && queue.length === 0) resolve();
-                  else setTimeout(checkDone, 10);
-                };
-                checkDone();
-              });
-              mediaSource.endOfStream();
-            } catch (err) {
-              console.error("MSE streaming failed, falling back:", err);
-              try { mediaSource.endOfStream(); } catch {}
-              URL.revokeObjectURL(objectUrl);
-              throw err;
-            }
-          })();
-        } else {
-          // Fallback: progressively grow a Blob and replace src, keeping time
-          const chunks: Uint8Array[] = [];
-          let started = false;
-          let url: string | null = null;
-          let lastTime = 0;
-
-          const rebuildAndPlay = () => {
-            const blob = new Blob(chunks, { type: "audio/wav" });
-            const newUrl = URL.createObjectURL(blob);
-            const wasPaused = audio.paused;
-            if (url) URL.revokeObjectURL(url);
-            url = newUrl;
-            audio.src = newUrl;
-            audio.currentTime = lastTime;
-            if (!wasPaused) audio.play().catch(() => {});
-          };
-
-          while (true) {
-            const { value, done } = await reader.read();
-            if (done) break;
-            if (value) {
-              chunks.push(value);
-              if (!started && chunks.length >= CACHE_SIZE) {
-                started = true;
-                rebuildAndPlay();
-              } else if (started) {
-                lastTime = audio.currentTime;
-                rebuildAndPlay();
-              }
-            }
-          }
-          audio.onended = () => {
-            if (url) URL.revokeObjectURL(url);
-            setSpeechMode("listening");
-          };
-        }
-        
-      } catch (error) {
-        console.error("Failed to play TTS audio:", error);
-      }
-      
-    })();
-  }, [status]);
-
-  useEffect(() => {
-    if (speechMode === "disabled" || speechMode === "speaking") return;
-    navigator.mediaDevices
-    .getUserMedia(
-      {
-        audio: true,
-      },
-    )
-    .then(stream => {
-      const SpeechRecognitionConstructor =
-        (window as any).SpeechRecognition ||
-        (window as any).webkitSpeechRecognition;
-      if (!SpeechRecognitionConstructor) {
-        toast.error("SpeechRecognition is not supported in this browser.");
-        return;
-      }
-      const recognition = new SpeechRecognitionConstructor();
-      recognition.lang = "en-US";
-      recognition.interimResults = true;
-      let transcript = "";
-      recognition.start();
-      recognition.onresult = (event: any) => {
-        transcript = event.results[0][0].transcript;
-        setText(transcript);
-      };
-      recognition.onend = (event: any) => {
-        submitTextMessage(transcript);
-        setSpeechMode("speaking");
-      };
-      recognition.onerror = (event: any) => {
-        toast.error("SpeechRecognition error: " + event.error);
-      };
-    })
-  }, [speechMode]);
+    if (status !== "ready" || speechMode !== "speaking") return;
+    const lastMessage = messages[messages.length - 1];
+    const textToSpeak =
+      lastMessage?.parts?.find((part) => part.type === "text")?.text ?? "";
+    if (textToSpeak) {
+      speak(textToSpeak);
+    }
+  }, [status, speechMode, messages, speak]);
 
   useEffect(() => {
     if (!model && models.length > 0) {
@@ -324,65 +167,68 @@ export default function Chat({
       <div
         className={`relative mx-auto flex h-[calc(100vh-3rem)] w-full flex-row rounded-lg p-6 pt-0 ${mode === "text" ? "max-w-4xl" : "w-full"}`}
       >
-        {(mode === "text" || mode === "2d-combined" || mode === "3d-combined") && (
-        <div className="mr-4 flex h-full w-full flex-col">
-          <Toaster />
-          <Conversation>
-            <ConversationContent>{renderedMessages}</ConversationContent>
-            <ConversationScrollButton />
-          </Conversation>
+        {(mode === "text" ||
+          mode === "2d-combined" ||
+          mode === "3d-combined") && (
+          <div className="mr-4 flex h-full w-full flex-col">
+            <Toaster />
+            <Conversation>
+              <ConversationContent>{renderedMessages}</ConversationContent>
+              <ConversationScrollButton />
+            </Conversation>
 
-          <PromptInput onSubmit={handleSubmit} className="mt-4">
-            <PromptInputTextarea
-              onChange={(e) => setText(e.target.value)}
-              value={text}
-            />
-            <PromptInputToolbar>
-              <PromptInputTools>
-                <PromptInputButton disabled={speechMode !== "disabled"} onClick={() => {
-                  setSpeechMode("listening");
-                  }}>
-                  <Volume2 size={16} />
-                </PromptInputButton>
-                <PromptInputModelSelect
-                  onValueChange={(value) => {
-                    if (!value || value === model) return;
-                    setModel(value);
-                    fetch("/api/models/LLM/set", {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ type: "LLMModel", value }),
-                    }).catch(() => {});
-                    toast("Model has been selected.");
-                  }}
-                  value={model}
-                >
-                  <PromptInputModelSelectTrigger
-                    onClick={() => {
-                      query.refetch();
-                    }}
-                  >
-                    <PromptInputModelSelectValue />
-                  </PromptInputModelSelectTrigger>
-                  <PromptInputModelSelectContent>
-                    {models.map((model) => (
-                      <PromptInputModelSelectItem
-                        key={model.name}
-                        value={model.name}
-                      >
-                        {model.name}
-                      </PromptInputModelSelectItem>
-                    ))}
-                  </PromptInputModelSelectContent>
-                </PromptInputModelSelect>
-              </PromptInputTools>
-              <PromptInputSubmit
-                disabled={!text || !model || query.isLoading}
-                status={status}
+            <PromptInput onSubmit={handleSubmit} className="mt-4">
+              <PromptInputTextarea
+                onChange={(e) => setText(e.target.value)}
+                value={text}
               />
-            </PromptInputToolbar>
-          </PromptInput>
-        </div>
+              <PromptInputToolbar>
+                <PromptInputTools>
+                  <PromptInputButton
+                    disabled={speechMode !== "disabled"}
+                    onClick={startListening}
+                  >
+                    <Volume2 size={16} />
+                  </PromptInputButton>
+                  <PromptInputModelSelect
+                    onValueChange={(value) => {
+                      if (!value || value === model) return;
+                      setModel(value);
+                      fetch("/api/models/LLM/set", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ type: "LLMModel", value }),
+                      }).catch(() => {});
+                      toast("Model has been selected.");
+                    }}
+                    value={model}
+                  >
+                    <PromptInputModelSelectTrigger
+                      onClick={() => {
+                        query.refetch();
+                      }}
+                    >
+                      <PromptInputModelSelectValue />
+                    </PromptInputModelSelectTrigger>
+                    <PromptInputModelSelectContent>
+                      {models.map((model) => (
+                        <PromptInputModelSelectItem
+                          key={model.name}
+                          value={model.name}
+                        >
+                          {model.name}
+                        </PromptInputModelSelectItem>
+                      ))}
+                    </PromptInputModelSelectContent>
+                  </PromptInputModelSelect>
+                </PromptInputTools>
+                <PromptInputSubmit
+                  disabled={!text || !model || query.isLoading}
+                  status={status}
+                />
+              </PromptInputToolbar>
+            </PromptInput>
+          </div>
         )}
         {(mode === "3d" || mode === "3d-combined") && (
           <div className="flex h-full min-h-0 w-full flex-col">

@@ -66,12 +66,17 @@ function AIMessage({ message }: { message: UIMessage }) {
                         const CACHE_SIZE = 8;
                         const data = new FormData();
                         data.append("text", part.text);
-                        const response = await fetch("http://localhost:8000/speech", {
-                          method: "POST",
-                          body: data,
-                        });
+                        const response = await fetch(
+                          "http://localhost:8000/speech",
+                          {
+                            method: "POST",
+                            body: data,
+                          },
+                        );
                         if (!response.ok) {
-                          throw new Error(`TTS request failed: ${response.status}`);
+                          throw new Error(
+                            `TTS request failed: ${response.status}`,
+                          );
                         }
                         const reader = response.body?.getReader();
                         if (!reader) {
@@ -83,10 +88,11 @@ function AIMessage({ message }: { message: UIMessage }) {
                         audio.autoplay = true;
 
                         const wavMime = 'audio/wav; codecs="1"';
-                        const canUseMSE = typeof MediaSource !== "undefined" &&
+                        const canUseMSE =
+                          typeof MediaSource !== "undefined" &&
                           (MediaSource as any).isTypeSupported &&
                           (MediaSource as any).isTypeSupported(wavMime);
-                          console.log("canUseMSE", canUseMSE);
+                        console.log("canUseMSE", canUseMSE);
 
                         if (canUseMSE) {
                           // Stream via MediaSource, start after ~CACHE_SIZE chunks
@@ -97,21 +103,32 @@ function AIMessage({ message }: { message: UIMessage }) {
                           const queue: Uint8Array[] = [];
 
                           await new Promise<void>((resolve) => {
-                            mediaSource.addEventListener("sourceopen", () => resolve(), { once: true });
+                            mediaSource.addEventListener(
+                              "sourceopen",
+                              () => resolve(),
+                              { once: true },
+                            );
                           });
 
-                          const sourceBuffer = mediaSource.addSourceBuffer(wavMime);
+                          const sourceBuffer =
+                            mediaSource.addSourceBuffer(wavMime);
 
                           const appendNext = () => {
                             if (sourceBuffer.updating) return;
                             const next = queue.shift();
                             if (next) {
-                              const slice = next.buffer.slice(next.byteOffset, next.byteOffset + next.byteLength);
+                              const slice = next.buffer.slice(
+                                next.byteOffset,
+                                next.byteOffset + next.byteLength,
+                              );
                               sourceBuffer.appendBuffer(slice);
                             }
                           };
 
-                          sourceBuffer.addEventListener("updateend", appendNext);
+                          sourceBuffer.addEventListener(
+                            "updateend",
+                            appendNext,
+                          );
 
                           (async () => {
                             try {
@@ -132,17 +149,30 @@ function AIMessage({ message }: { message: UIMessage }) {
                               }
                               // Flush remaining and close
                               await new Promise<void>((resolve) => {
-                                if (!sourceBuffer.updating && queue.length === 0) return resolve();
+                                if (
+                                  !sourceBuffer.updating &&
+                                  queue.length === 0
+                                )
+                                  return resolve();
                                 const checkDone = () => {
-                                  if (!sourceBuffer.updating && queue.length === 0) resolve();
+                                  if (
+                                    !sourceBuffer.updating &&
+                                    queue.length === 0
+                                  )
+                                    resolve();
                                   else setTimeout(checkDone, 10);
                                 };
                                 checkDone();
                               });
                               mediaSource.endOfStream();
                             } catch (err) {
-                              console.error("MSE streaming failed, falling back:", err);
-                              try { mediaSource.endOfStream(); } catch {}
+                              console.error(
+                                "MSE streaming failed, falling back:",
+                                err,
+                              );
+                              try {
+                                mediaSource.endOfStream();
+                              } catch {}
                               URL.revokeObjectURL(objectUrl);
                               throw err;
                             }
@@ -155,7 +185,9 @@ function AIMessage({ message }: { message: UIMessage }) {
                           let lastTime = 0;
 
                           const rebuildAndPlay = () => {
-                            const blob = new Blob(chunks, { type: "audio/wav" });
+                            const blob = new Blob(chunks, {
+                              type: "audio/wav",
+                            });
                             const newUrl = URL.createObjectURL(blob);
                             const wasPaused = audio.paused;
                             if (url) URL.revokeObjectURL(url);

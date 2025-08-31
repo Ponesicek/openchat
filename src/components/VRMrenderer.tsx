@@ -33,7 +33,7 @@ function VRMRenderer({
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
-  
+
   useEffect(() => {
     // #region THREE.js initialization
     const container = containerRef.current;
