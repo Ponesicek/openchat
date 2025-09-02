@@ -1,4 +1,4 @@
-import { loadChat, checkNewestChat } from "@/util/chat-store";
+import { loadChat } from "@/util/chat-store";
 import Chat from "./ui";
 
 export default async function Page(props: { params: Promise<{ id: string }> }) {

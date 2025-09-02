@@ -8,8 +8,6 @@ from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from faster_whisper import WhisperModel
 import requests
-import sounddevice as sd
-import numpy as np
 
 app = FastAPI()
 

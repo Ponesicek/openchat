@@ -65,8 +65,9 @@ export default function Chat({
     if (status !== "ready" || speechMode === "disabled" || speechMode === "listening") return;
     (async () => {
       try {
-        const textToSpeak =
+        const messageToSpeak =
           messages[messages.length - 1]?.parts?.find((part) => part.type === "text")?.text ?? "";
+        const textToSpeak = messageToSpeak.replace(/[-\u2012\u2013\u2014]/g, " ");
         if (!textToSpeak) return;
         await speak(textToSpeak);
         setSpeechMode("listening");
@@ -205,8 +206,12 @@ export default function Chat({
             />
             <PromptInputToolbar>
               <PromptInputTools>
-                <PromptInputButton disabled={speechMode !== "disabled"} onClick={() => {
-                  setSpeechMode("listening");
+                <PromptInputButton variant={speechMode === "disabled" ? "ghost" : "secondary"} onClick={() => {
+                  if (speechMode === "disabled") {
+                    setSpeechMode("listening");
+                  } else {
+                    setSpeechMode("disabled");
+                  }
                   }}>
                   <Volume2 size={16} />
                 </PromptInputButton>
